@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SnowDoku — Fresh Tracks & Avalanche</title>
+<meta name="description" content="Winter brain games in Roman numerals. Fresh Tracks: sudoku where every tile is two puzzles at once, from bunny slope to double black diamond. Avalanche: drop-and-merge with sport powers. No luck, no crying.">
+<meta property="og:title" content="SnowDoku — winter brain games">
+<meta property="og:description" content="Sudoku × winter sports. Four slopes from bunny hill to double black diamond, plus the Avalanche merge game.">
+
+<style>
+  :root{
+    --bg:#0e1a2b; --panel:#16283f; --ink:#eaf2fb; --dim:#8fa8c4;
+    --ski:#5ab0ff; --board:#ffab4a; --skate:#c99aff; --shoe:#7fe08a;
+    --frozen:#24405f;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0; min-height:100vh; background:linear-gradient(180deg,#0e1a2b,#132238);
+    color:var(--ink); font-family:Georgia,'Times New Roman',serif;
+    display:flex; justify-content:center;
+  }
+  .app{width:100%; max-width:430px; padding:14px 14px 28px;}
+  h1{font-size:1.3rem; margin:0; letter-spacing:.5px;}
+  h1 small{display:block; font-size:.65rem; color:var(--dim); font-style:italic; letter-spacing:1px;}
+  button{
+    font-family:inherit; font-size:.85rem; color:var(--ink);
+    background:#25405f; border:1px solid #3a5a80; border-radius:8px;
+    padding:8px 12px; cursor:pointer;
+  }
+  button:active{transform:translateY(1px);}
+  button:disabled{opacity:.3; cursor:default;}
+  header{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px;}
+  .screen{display:none;}
+  .screen.on{display:block;}
+  .c-ski{color:var(--ski);} .c-board{color:var(--board);}
+  .c-skate{color:var(--skate);} .c-shoe{color:var(--shoe);}
+  .c-sled{color:#ff8fb1;} .c-hockey{color:#66e0d5;} .c-curl{color:#d8c27a;}
+  .c-alpine{color:#9db2ff;} .c-snowman{color:#e8f4ff;}
+  /* menu */
+  .mode-card{
+    display:block; width:100%; text-align:left; background:var(--panel);
+    border:1px solid #3a5a80; border-radius:14px; padding:16px; margin-top:14px;
+  }
+  .mode-card h2{margin:0 0 4px; font-size:1.1rem;}
+  .mode-card p{margin:0; font-size:.82rem; color:var(--dim);}
+  .mode-card .stat{margin-top:8px; font-size:.75rem; color:var(--dim);}
+  .legend{display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; font-size:.8rem;}
+  /* fresh tracks board */
+  #ftWrap{
+    display:grid; gap:4px; background:var(--panel); padding:8px; border-radius:14px;
+    grid-template-columns:26px 1fr 1fr 10px 1fr 1fr 26px;
+    grid-template-rows:26px 1fr 1fr 10px 1fr 1fr 26px;
+  }
+  .cell{
+    aspect-ratio:1; border-radius:8px; background:#101f33; border:1px solid #2a4364;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:1.15rem; user-select:none; cursor:pointer;
+  }
+  .cell .num{font-weight:bold; line-height:1;}
+  .cell .suit{font-size:.9rem; line-height:1.15;}
+  .cell.frozen{background:var(--frozen); border-color:#3f6288;}
+  .cell.legal{background:#1c3a2b; border-color:#3f7a52;}
+  .modeOn{border-color:#7fe08a; color:#7fe08a;}
+  #ftStrikes{color:#ffab4a; font-weight:bold;}
+  #ftWrap.lv2 .cell{font-size:2.6rem;}
+  #ftWrap.lv2 .cell .suit{font-size:1.7rem;}
+  #ftWrap.lv9{gap:2px; padding:6px;}
+  #ftWrap.lv9 .cell{font-size:.66rem; border-radius:4px; border-width:1px;}
+  #ftWrap.lv9 .cell .num.long{font-size:.52rem; letter-spacing:-.5px;}
+  #ftWrap.lv9 .cell .suit{font-size:.6rem; line-height:1;}
+  #ftLineup.lv9chips{gap:4px;}
+  #ftLineup.lv9chips .chip{width:34px; height:40px; font-size:.78rem;}
+  #ftLineup.lv9chips .chip .suit{font-size:.66rem;}
+  .hintFlash{outline:3px solid #ffd76a; outline-offset:-2px;}
+  .entry{
+    border:none; background:transparent; color:#3a5a80; font-size:.95rem;
+    padding:0; display:flex; align-items:center; justify-content:center;
+  }
+  .entry.live{color:#7fe08a; background:#1c3a2b; border-radius:6px;}
+  .entry.hid{visibility:hidden;}
+  #ftLineup{
+    display:flex; flex-wrap:wrap; gap:6px; background:var(--panel);
+    border-radius:14px; padding:10px; margin-top:12px; min-height:56px;
+  }
+  .chip{
+    width:44px; height:52px; border-radius:8px; background:#101f33;
+    border:1px solid #2a4364; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; font-size:1rem; cursor:pointer;
+  }
+  .chip .suit{font-size:.85rem;}
+  .chip.sel{border:2px solid #7fe08a; background:#1c3a2b;}
+  .bar{display:flex; gap:8px; margin-top:12px; align-items:center;}
+  .hint{font-size:.78rem; color:var(--dim); margin-top:10px; min-height:1.2em;}
+  /* avalanche */
+  #avBoard{
+    display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px;
+    background:var(--panel); padding:8px; border-radius:14px;
+  }
+  #avBoard .cell{border-radius:6px; font-size:1rem;}
+  #avBoard .cell .num.long{font-size:.78rem;}
+  #avBoard .cell.boom{background:#4a2530;}
+  .avTop{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:.85rem; color:var(--dim);}
+  .avTop b{color:var(--ink);}
+  #avQueue{display:flex; gap:6px; align-items:center;}
+  #avQueue .chip{width:38px; height:44px; cursor:default;}
+  #avPowers{display:flex; gap:8px; margin-top:12px;}
+  .pw{flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 4px;}
+  .pw .pips{font-size:.6rem; letter-spacing:2px; color:var(--dim);}
+  .pw.ready{border-color:#7fe08a;}
+  .pw.arm{background:#1c3a2b; border-color:#7fe08a;}
+  /* overlay */
+  #overlay{position:fixed; inset:0; background:rgba(8,14,24,.82); display:flex; align-items:center; justify-content:center; z-index:10;}
+  #overlay[hidden]{display:none;}
+  .ov{background:var(--panel); border:1px solid #3a5a80; border-radius:16px; padding:26px 30px; text-align:center; max-width:300px;}
+  .ov h2{margin:0 0 8px; font-size:1.4rem;}
+  .ov p{color:var(--dim); font-size:.9rem; margin:0 0 18px;}
+  .ov .row{display:flex; gap:10px; justify-content:center;}
+  details{margin-top:14px; background:var(--panel); border-radius:12px; padding:10px 14px; font-size:.82rem; color:var(--dim);}
+  details summary{cursor:pointer; color:var(--ink);}
+  details li{margin:6px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ MENU ============ -->
+  <div id="menu" class="screen on">
+    <header><h1>SnowDoku<small>winter games in roman numerals</small></h1></header>
+    <button class="mode-card" id="goTracks">
+      <h2>⛰️ Fresh Tracks</h2>
+      <p>The thinking game. Every tile is two puzzles at once — numeral AND sport must fit. Four slopes: 🟢 learn on 4 squares · 🔵 4×4 · ⚫ 9×9 black diamond · ⚫⚫ Slopestyle, where athletes ski to their tiles. Three ✗ and you're out. 💡 coach included.</p>
+      <div class="stat">Summits reached: <b id="statTracks">0</b></div>
+    </button>
+    <button class="mode-card" id="goAval">
+      <h2>❄️ Avalanche</h2>
+      <p>The fast game. Drop and merge numerals — I and I make II, all the way to X. Same-suit merges charge sport powers that clear in that sport's shape.</p>
+      <div class="stat">Best score: <b id="statAval">0</b></div>
+    </button>
+    <div class="legend">
+      <span class="c-ski">🎿 Skis</span>
+      <span class="c-board">🏂 Snowboard</span>
+      <span class="c-skate">⛸️ Ice Skates</span>
+      <span class="c-shoe">🥾 Snowshoes</span>
+    </div>
+  </div>
+
+  <!-- ============ FRESH TRACKS ============ -->
+  <div id="tracks" class="screen">
+    <header>
+      <button class="back" data-to="menu">‹ Menu</button>
+      <h1>Fresh Tracks</h1>
+      <button id="ftNew">New deal</button>
+    </header>
+    <div class="bar" style="margin:0 0 10px">
+      <button id="lvGreen" title="Green — learn on 4 squares">🟢</button>
+      <button id="lvBlue" title="Blue — 4×4">🔵</button>
+      <button id="lvBlack" title="Black diamond — 9×9">⚫</button>
+      <button id="lvDblack" title="Double black — Slopestyle">⚫⚫</button>
+      <button id="ftHintBtn" title="Coach — show me a move">💡</button>
+      <span id="ftStrikes" style="margin-left:auto;font-size:1.05rem;letter-spacing:4px"></span>
+    </div>
+    <div id="ftWrap"></div>
+    <div class="hint" id="ftHint">Pick an athlete below.</div>
+    <div id="ftLineup"></div>
+    <div class="bar">
+      <button id="ftUndo">Undo</button>
+      <button id="ftRestart">Restart deal</button>
+    </div>
+    <details>
+      <summary>How to play</summary>
+      <ul>
+        <li>Every tile is two puzzles at once — the <b>numeral</b> and the <b>sport</b> both have to fit. Pick a card below, then tap where it goes.</li>
+        <li>🟢 <b>Green:</b> the bunny slope — I, II, III and IV in four different suits. Every card fits anywhere; just learn to pick up and place. The rules kick in on blue.</li>
+        <li>🔵 <b>Blue:</b> 4&times;4 — every row, column and 2&times;2 box needs each numeral <b>I&ndash;IV</b> and each sport once.</li>
+        <li>⚫ <b>Black diamond:</b> 9&times;9 — full sudoku with numerals <b>I&ndash;IX</b> AND nine winter sports, both sudoku-valid at once.</li>
+        <li>⚫⚫ <b>Double black:</b> Slopestyle — athletes ski to their tiles. 🎿 drop straight down, 🏂 carve diagonally off walls, ⛸️ glide in from the side, 🥾 walk anywhere. Colored lanes show where each entry lands. Undo is free — the terrain is the trap.</li>
+        <li>The lineup is exactly the right cards to finish the board. A move that breaks the rules — or would make the mountain impossible to finish — gets an <b>✗</b>, but the card comes back to you to try somewhere else. Mistakes add up: three ✗ in one run and you&rsquo;re out. Every deal is solvable.</li>
+        <li>💡 is your coach — it glows a correct card and spot when you&rsquo;re stuck.</li>
+      </ul>
+    </details>
+  </div>
+
+  <!-- ============ AVALANCHE ============ -->
+  <div id="aval" class="screen">
+    <header>
+      <button class="back" data-to="menu">‹ Menu</button>
+      <h1>Avalanche</h1>
+      <button id="avNew">New run</button>
+    </header>
+    <div class="avTop">
+      <span>Score <b id="avScore">0</b></span>
+      <span>Best <b id="avBest">0</b></span>
+      <span id="avQueue"></span>
+    </div>
+    <div id="avBoard"></div>
+    <div class="hint" id="avHint">Tap a column to drop.</div>
+    <div id="avPowers"></div>
+    <details>
+      <summary>How to play</summary>
+      <ul>
+        <li>Tap a column to drop the next numeral. Equal neighbours merge upward: I+I&rarr;II &hellip; IX+IX&rarr;X. Two X&rsquo;s vanish for a big bonus.</li>
+        <li>Same-suit merges score double and charge that sport&rsquo;s power (3 charges).</li>
+        <li>🎿 clears a column &middot; ⛸️ clears a row &middot; 🏂 clears an X shape &middot; 🥾 clears one tile.</li>
+        <li>The run ends when the board fills up.</li>
+      </ul>
+    </details>
+  </div>
+
+  <div id="overlay" hidden>
+    <div class="ov">
+      <h2 id="ovTitle"></h2>
+      <p id="ovMsg"></p>
+      <div class="row" id="ovBtns"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const SUITS=[
+    {id:'ski',  sym:'🎿'},
+    {id:'board',sym:'🏂'},
+    {id:'skate',sym:'⛸️'},
+    {id:'shoe', sym:'🥾'},
+    {id:'sled', sym:'🛷'},
+    {id:'hockey',sym:'🏒'},
+    {id:'curl', sym:'🥌'},
+    {id:'alpine',sym:'⛷️'},
+    {id:'snowman',sym:'☃️'}
+  ];
+  const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X'];
+  const $=id=>document.getElementById(id);
+  function shuffle(a){
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+  function cardHTML(card,small){
+    const s=SUITS[card.s];
+    const n=ROMAN[card.n!==undefined?card.n:card.v];
+    return `<span class="num c-${s.id}${n.length>2?' long':''}">${n}</span>`+
+           `<span class="suit">${s.sym}</span>`;
+  }
+
+  /* ---------- screens ---------- */
+  function show(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+    $(id).classList.add('on');
+    $('overlay').hidden=true;
+    refreshStats();
+  }
+  document.querySelectorAll('.back').forEach(b=>b.addEventListener('click',()=>show(b.dataset.to)));
+  function refreshStats(){
+    $('statTracks').textContent=localStorage.getItem('sd_tracks_wins')||'0';
+    $('statAval').textContent=localStorage.getItem('sd_aval_best')||'0';
+  }
+  function overlay(title,msg,btns){
+    $('ovTitle').textContent=title;
+    $('ovMsg').textContent=msg;
+    const row=$('ovBtns'); row.innerHTML='';
+    btns.forEach(([label,fn])=>{
+      const b=document.createElement('button');
+      b.textContent=label;
+      b.addEventListener('click',()=>{$('overlay').hidden=true; fn();});
+      row.appendChild(b);
+    });
+    $('overlay').hidden=false;
+  }
+
+  /* ================= FRESH TRACKS ================= */
+  const FT=(()=>{
+    /* slope ladder: green = 2x2 tutorial, blue = 4x4, black = 9x9,
+       double black = 4x4 with movement physics */
+    const LV={
+      green:{n:2},
+      blue:{n:4,bw:2,bh:2},
+      black:{n:9,bw:3,bh:3},
+      dblack:{n:4,bw:2,bh:2,physics:true}
+    };
+    let level=localStorage.getItem('sd_tracks_level');
+    if(!LV[level]) level='green';
+    const cfg=()=>LV[level];
+    const N=4; // physics board size (double black only)
+    const row=i=>Math.floor(i/cfg().n), col=i=>i%cfg().n;
+    function box(i){
+      const c=cfg();
+      if(!c.bw) return i; // green: no boxes — every cell its own
+      return Math.floor(row(i)/c.bh)*(c.n/c.bw)+Math.floor(col(i)/c.bw);
+    }
+    function conflicts(g,i,card){
+      const nn=cfg().n*cfg().n;
+      for(let j=0;j<nn;j++){
+        const c=g[j];
+        if(!c||j===i) continue;
+        if(row(j)===row(i)||col(j)===col(i)||box(j)===box(i))
+          if(c.n===card.n||c.s===card.s) return true;
+      }
+      return false;
+    }
+    /* movement physics — landing cell or null */
+    function landSki(g,c){
+      if(g[c]) return null;
+      let r=0;
+      while(r+1<N&&!g[(r+1)*N+c]) r++;
+      return r*N+c;
+    }
+    function landBoard(g,c){
+      if(g[c]) return null;
+      let r=0,cc=c,dir=(c===N-1?-1:1);
+      for(;;){
+        const nr=r+1;
+        if(nr>=N) break;
+        let nc=cc+dir;
+        if(nc<0||nc>=N){dir=-dir; nc=cc+dir;}
+        if(!g[nr*N+nc]){r=nr;cc=nc;} else break;
+      }
+      return r*N+cc;
+    }
+    function landSkate(g,r,side){ // side 0=left, 1=right
+      let c=side?N-1:0;
+      const step=side?-1:1;
+      if(g[r*N+c]) return null;
+      while(c+step>=0&&c+step<N&&!g[r*N+c+step]) c+=step;
+      return r*N+c;
+    }
+    function movesFor(g,card){
+      const out=[];
+      if(card.s===0){ // skis
+        for(let c=0;c<N;c++){const L=landSki(g,c); if(L!==null&&!conflicts(g,L,card)) out.push({kind:'col',c,landing:L});}
+      }else if(card.s===1){ // snowboard
+        for(let c=0;c<N;c++){const L=landBoard(g,c); if(L!==null&&!conflicts(g,L,card)) out.push({kind:'col',c,landing:L});}
+      }else if(card.s===2){ // skates
+        for(let r=0;r<N;r++)for(let side=0;side<2;side++){
+          const L=landSkate(g,r,side); if(L!==null&&!conflicts(g,L,card)) out.push({kind:'side',r,side,landing:L});
+        }
+      }else{ // snowshoes
+        for(let i=0;i<16;i++) if(!g[i]&&!conflicts(g,i,card)) out.push({kind:'cell',landing:i});
+      }
+      return out;
+    }
+    /* full-solution generator (same as v1) */
+    function genSolution(){
+      const cells=new Array(16).fill(null);
+      const pairs=[];
+      for(let n=0;n<N;n++)for(let s=0;s<N;s++)pairs.push({n,s});
+      function rec(i,rem){
+        if(i===16) return true;
+        for(const p of shuffle(rem.slice())){
+          if(!conflicts(cells,i,p)){
+            cells[i]=p;
+            if(rec(i+1,rem.filter(q=>q!==p))) return true;
+            cells[i]=null;
+          }
+        }
+        return false;
+      }
+      rec(0,pairs);
+      return cells;
+    }
+    /* solver: is this deal winnable with the movement rules? */
+    function solve(g0,cards0,cap){
+      let nodes=0;
+      function prune(g,cards){
+        for(let i=0;i<16;i++){
+          if(g[i]) continue;
+          if(!cards.some(c=>!conflicts(g,i,c))) return true;
+        }
+        return false;
+      }
+      function rec(g,cards){
+        if(nodes++>cap) throw 0;
+        if(cards.length===0) return true;
+        if(prune(g,cards)) return false;
+        const seen=new Set(), all=[];
+        for(let i=0;i<cards.length;i++){
+          const key=cards[i].n+','+cards[i].s;
+          if(seen.has(key)) continue;
+          seen.add(key);
+          for(const m of movesFor(g,cards[i])) all.push([i,m.landing]);
+        }
+        for(const [i,L] of shuffle(all)){
+          const g2=g.slice(); g2[L]=cards[i];
+          if(rec(g2,cards.toSpliced(i,1))) return true;
+        }
+        return false;
+      }
+      try{return rec(g0,cards0);}catch(e){return null;}
+    }
+    /* green: the bunny slope — I,II,III,IV in four different suits.
+       Nothing can clash, so every card fits anywhere: pure pick-up-and-place
+       practice before the real rules start on blue. */
+    function genGreen(){
+      const su=shuffle([0,1,2,3]);
+      return shuffle([0,1,2,3]).map((v,i)=>({n:v,s:su[i]}));
+    }
+    /* black: 9x9 orthogonal sudoku pair via the classic base-3 construction —
+       numerals AND sports are each sudoku-valid, every (numeral,sport) pair
+       appears exactly once. Randomized by symbol/row/column permutations. */
+    function genBlack(){
+      const P=k=>shuffle([...Array(k).keys()]);
+      const pn=P(9), ps=P(9);
+      const rowMap=[], colMap=[];
+      for(const b of P(3)) for(const k of P(3)) rowMap.push(3*b+k);
+      for(const b of P(3)) for(const k of P(3)) colMap.push(3*b+k);
+      const cells=new Array(81);
+      for(let r=0;r<9;r++)for(let c=0;c<9;c++){
+        const rr=rowMap[r], cc=colMap[c];
+        const r1=Math.floor(rr/3), r0=rr%3, c1=Math.floor(cc/3), c0=cc%3;
+        const A=3*((r0+c1)%3)+((r1+c0)%3);
+        const B=3*((r0+2*c1)%3)+((r1+2*c0)%3);
+        cells[r*9+c]={n:pn[A],s:ps[B]};
+      }
+      return cells;
+    }
+    /* winnability: can each card reach its own target cell in SOME order?
+       State space is subsets of the 12 lineup cards — tiny with memo. */
+    function dealWinnable(g0,items){
+      const n=items.length, full=(1<<n)-1;
+      const memo=new Set();
+      function reach(g,card,T){
+        if(card.s===3) return !g[T];
+        if(card.s===0) return landSki(g,col(T))===T;
+        if(card.s===1){
+          for(let c=0;c<N;c++) if(landBoard(g,c)===T) return true;
+          return false;
+        }
+        return landSkate(g,row(T),0)===T||landSkate(g,row(T),1)===T;
+      }
+      function rec(g,mask){
+        if(mask===full) return true;
+        if(memo.has(mask)) return false;
+        for(let i=0;i<n;i++){
+          if(mask&(1<<i)) continue;
+          if(reach(g,items[i].card,items[i].t)){
+            g[items[i].t]=items[i].card;
+            if(rec(g,mask|(1<<i))) return true;
+            g[items[i].t]=null;
+          }
+        }
+        memo.add(mask);
+        return false;
+      }
+      return rec(g0.slice(),0);
+    }
+    /* can the rest of the lineup still fill the board? (no physics — pure CSP) */
+    function completable(g,cards){
+      if(cards.length===0) return true;
+      const nn=cfg().n*cfg().n;
+      let bestI=-1,bestOpts=null;
+      for(let i=0;i<nn;i++){
+        if(g[i]) continue;
+        const opts=cards.filter(c=>!conflicts(g,i,c));
+        if(opts.length===0) return false;
+        if(!bestOpts||opts.length<bestOpts.length){bestI=i;bestOpts=opts;}
+      }
+      if(bestI===-1) return true;
+      for(const c of bestOpts){
+        g[bestI]=c;
+        if(completable(g,cards.filter(x=>x!==c))){g[bestI]=null;return true;}
+        g[bestI]=null;
+      }
+      return false;
+    }
+    /* state */
+    let grid,frozen,lineup,sel,undoStack,deal,strikes=0,hintMsg=null;
+    function newDeal(){
+      const c=cfg();
+      if(c.physics){
+        for(let tries=0;tries<200;tries++){
+          const sol=genSolution();
+          const fz=new Set();
+          for(let b=0;b<4;b++){
+            const opts=[];
+            for(let i=0;i<16;i++) if(box(i)===b) opts.push(i);
+            fz.add(opts[Math.floor(Math.random()*opts.length)]);
+          }
+          const g=sol.map((cd,i)=>fz.has(i)?cd:null);
+          const items=shuffle(sol.map((cd,i)=>({card:cd,t:i})).filter(x=>!fz.has(x.t)));
+          if(dealWinnable(g,items)){
+            deal={g:g.slice(),cards:items.map(x=>x.card),fz:[...fz],sol};
+            restart();
+            return;
+          }
+        }
+        throw new Error('deal generation failed');
+      }
+      let sol,fz;
+      if(level==='green'){
+        sol=genGreen();
+        fz=new Set([Math.floor(Math.random()*4)]);
+      }else if(level==='blue'){
+        sol=genSolution();
+        fz=new Set();
+        for(let b=0;b<4;b++){
+          const opts=[];
+          for(let i=0;i<16;i++) if(box(i)===b) opts.push(i);
+          fz.add(opts[Math.floor(Math.random()*opts.length)]);
+        }
+      }else{ // black diamond
+        sol=genBlack();
+        fz=new Set(shuffle([...Array(81).keys()]).slice(0,31));
+      }
+      const cards=sol.map((cd,i)=>fz.has(i)?null:cd).filter(Boolean)
+        .sort((a,b)=>a.n-b.n||a.s-b.s);
+      deal={g:sol.map((cd,i)=>fz.has(i)?cd:null),cards,fz:[...fz],sol};
+      restart();
+    }
+    function restart(){
+      grid=deal.g.slice();
+      frozen=new Set(deal.fz);
+      lineup=deal.cards.slice();
+      sel=null; undoStack=[]; strikes=0; hintMsg=null;
+      render();
+    }
+    function setLevel(l){
+      if(!LV[l]||l===level) return;
+      level=l;
+      localStorage.setItem('sd_tracks_level',l);
+      newDeal();
+    }
+    function snapshot(){undoStack.push({g:grid.slice(),l:lineup.slice()});}
+    function undo(){
+      const s=undoStack.pop();
+      if(!s) return;
+      grid=s.g; lineup=s.l; sel=null;
+      render();
+    }
+    function place(cardIdx,landing){
+      snapshot();
+      hintMsg=null;
+      grid[landing]=lineup[cardIdx];
+      lineup.splice(cardIdx,1);
+      sel=null;
+      if(level==='green'&&lineup.length>0)
+        hintMsg=`Nice! ${lineup.length} card${lineup.length===1?'':'s'} to go — pick up another.`;
+      render();
+      if(lineup.length===0){
+        const w=+(localStorage.getItem('sd_tracks_wins')||0)+1;
+        localStorage.setItem('sd_tracks_wins',w);
+        const titles={green:'Bunny slope cleared! 🐰',blue:'Summit reached! 🏔️',
+                      black:'Black diamond conquered! 🖤',dblack:'Double black! 🏆'};
+        const next={green:['blue','Next: 🔵 blue'],blue:['black','Next: ⚫ black diamond'],
+                    black:['dblack','Next: ⚫⚫ Slopestyle']}[level];
+        const btns=[['New deal',newDeal]];
+        if(next) btns.push([next[1],()=>setLevel(next[0])]);
+        btns.push(['Menu',()=>show('menu')]);
+        overlay(titles[level],'Every card found its place. Fresh powder awaits.',btns);
+        return;
+      }
+      if(cfg().physics){
+        const anyMove=lineup.some(c=>movesFor(grid,c).length>0);
+        if(!anyMove)
+          overlay('Snowed in! ❄️','No athlete has a legal run from here. Back up or start over — this deal can be won.',
+            [['Undo',undo],['Restart',restart]]);
+      }
+    }
+    function strike(cellIdx,msg){
+      strikes++;
+      hintMsg=msg;
+      const el=wrap.querySelector(`[data-idx="${cellIdx}"]`);
+      if(el){el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'),320);}
+      renderTop();
+      if(strikes>=3){
+        overlay('Three ✗ — snowed in! ❄️','The mountain wins this run. Same deal or fresh powder?',
+          [['Retry deal',restart],['New deal',newDeal],['Menu',()=>show('menu')]]);
+      }
+    }
+    function conflictReason(g,i,card){
+      const nn=cfg().n*cfg().n;
+      for(let j=0;j<nn;j++){
+        const o=g[j];
+        if(!o||j===i) continue;
+        const where=row(j)===row(i)?'row':col(j)===col(i)?'column':box(j)===box(i)?'box':null;
+        if(!where) continue;
+        if(o.n===card.n) return `that ${where} already has a ${ROMAN[o.n]}`;
+        if(o.s===card.s) return `that ${where} already has ${SUITS[o.s].sym}`;
+      }
+      return 'that spot breaks a row, column or box';
+    }
+    function placeClassic(cellIdx){
+      if(sel===null||grid[cellIdx]) return;
+      const card=lineup[sel];
+      if(conflicts(grid,cellIdx,card)){
+        strike(cellIdx,`✗ — ${conflictReason(grid,cellIdx,card)}. The card is still yours — try another spot.`);
+        return;
+      }
+      const g2=grid.slice(); g2[cellIdx]=card;
+      if(!completable(g2,lineup.toSpliced(sel,1))){
+        strike(cellIdx,'✗ — dead end. The mountain couldn’t be finished from there.');
+        return;
+      }
+      place(sel,cellIdx);
+    }
+    /* 💡 coach: find a correct move and glow it (free, for learning) */
+    function hint(){
+      if(!deal||!lineup.length) return;
+      const c=cfg();
+      let pick=null;
+      // prefer each card's own cell in the dealt solution
+      for(let ci=0;ci<lineup.length&&!pick;ci++){
+        const card=lineup[ci];
+        const t=deal.sol.findIndex(s=>s.n===card.n&&s.s===card.s);
+        if(t<0||grid[t]) continue;
+        if(c.physics){
+          if(movesFor(grid,card).some(m=>m.landing===t)) pick={ci,cell:t};
+        }else if(!conflicts(grid,t,card)){
+          const g2=grid.slice(); g2[t]=card;
+          if(completable(g2,lineup.toSpliced(ci,1))) pick={ci,cell:t};
+        }
+      }
+      // fallback: any correct move
+      if(!pick&&c.physics){
+        for(let ci=0;ci<lineup.length&&!pick;ci++){
+          const ms=movesFor(grid,lineup[ci]);
+          if(ms.length) pick={ci,cell:ms[0].landing};
+        }
+      }
+      if(!pick&&!c.physics){
+        const nn=c.n*c.n;
+        outer:
+        for(let ci=0;ci<lineup.length;ci++){
+          for(let i=0;i<nn;i++){
+            if(grid[i]||conflicts(grid,i,lineup[ci])) continue;
+            const g2=grid.slice(); g2[i]=lineup[ci];
+            if(completable(g2,lineup.toSpliced(ci,1))){pick={ci,cell:i};break outer;}
+          }
+        }
+      }
+      if(!pick) return;
+      sel=pick.ci;
+      hintMsg='💡 The glowing card fits the glowing spot.';
+      render();
+      const cellEl=wrap.querySelector(`[data-idx="${pick.cell}"]`);
+      const chipEl=$('ftLineup').children[pick.ci];
+      [cellEl,chipEl].forEach(e=>e&&e.classList.add('hintFlash'));
+      setTimeout(()=>{
+        [cellEl,chipEl].forEach(e=>e&&e.classList.remove('hintFlash'));
+      },2600);
+    }
+    /* rendering */
+    const wrap=$('ftWrap');
+    function renderTop(){
+      const c=cfg();
+      const ids={green:'lvGreen',blue:'lvBlue',black:'lvBlack',dblack:'lvDblack'};
+      for(const l in ids) $(ids[l]).classList.toggle('modeOn',l===level);
+      $('ftStrikes').textContent=c.physics?'':'✗'.repeat(strikes)+'·'.repeat(3-strikes);
+      const card=sel!==null?lineup[sel]:null;
+      const slopeHints={0:'Skis drop from the top — tap a lit ▼. Lanes show the landing.',
+                   1:'Snowboard carves diagonally — tap a lit ▼. Lanes show the landing.',
+                   2:'Skates glide in from the side — tap ▶ or ◀. Lanes show the landing.',
+                   3:'Snowshoes walk anywhere — tap a lit cell.'};
+      const idle={green:'Bunny slope 🟢 — four cards, four cells, every card fits. Pick one up below.',
+                  blue:'Pick a card. Rows, columns and 2×2 boxes each need every numeral and sport once.',
+                  black:'Black diamond ⚫ — 9×9, two sudokus at once. 💡 is your coach.',
+                  dblack:'Double black ⚫⚫ — pick an athlete; they ski to their tile.'};
+      const picked={green:'Now tap any green cell — on the bunny slope, every spot works!',
+                    blue:'Tap any open cell — a wrong spot costs an ✗ but you keep the card.',
+                    black:'Tap any open cell — a wrong spot costs an ✗ but you keep the card.'};
+      $('ftHint').textContent=hintMsg||(card
+        ?(c.physics?slopeHints[card.s]:picked[level])
+        :idle[level]);
+    }
+    function render(){
+      const c=cfg(), n=c.n, nn=n*n;
+      wrap.innerHTML='';
+      wrap.className='lv'+n;
+      let tpl,gpos;
+      if(c.physics){ tpl='26px 1fr 1fr 10px 1fr 1fr 26px'; gpos=v=>v+2+(v>=2?1:0); }
+      else if(n===2){ tpl='1fr 1fr'; gpos=v=>v+1; }
+      else if(n===4){ tpl='1fr 1fr 10px 1fr 1fr'; gpos=v=>v+1+(v>=2?1:0); }
+      else{ tpl='1fr 1fr 1fr 6px 1fr 1fr 1fr 6px 1fr 1fr 1fr'; gpos=v=>v+1+Math.floor(v/3); }
+      wrap.style.gridTemplateColumns=tpl;
+      wrap.style.gridTemplateRows=tpl;
+      const card=sel!==null?lineup[sel]:null;
+      const suitColor=card?`var(--${SUITS[card.s].id})`:null;
+      const moves=(c.physics&&card)?movesFor(grid,card):[];
+      const colLive=new Set(moves.filter(m=>m.kind==='col').map(m=>m.c));
+      const sideLive=new Set(moves.filter(m=>m.kind==='side').map(m=>m.r+':'+m.side));
+      const cellLive=new Set(moves.filter(m=>m.kind==='cell').map(m=>m.landing));
+      if(level==='green'&&card)
+        for(let i=0;i<nn;i++) if(!grid[i]) cellLive.add(i);
+      const lane=new Set(moves.map(m=>m.landing)); // colored lanes: landings
+      const isCol=c.physics&&card&&(card.s===0||card.s===1);
+      const isSide=c.physics&&card&&card.s===2;
+      if(c.physics){
+        for(let cc=0;cc<4;cc++){
+          const b=document.createElement('button');
+          b.className='entry'+(colLive.has(cc)?' live':isCol?'':' hid');
+          b.textContent='▼';
+          if(colLive.has(cc)&&suitColor) b.style.color=suitColor;
+          b.style.gridRow=1; b.style.gridColumn=gpos(cc);
+          b.disabled=!colLive.has(cc);
+          b.addEventListener('click',()=>{
+            const m=moves.find(m=>m.kind==='col'&&m.c===cc);
+            if(m) place(sel,m.landing);
+          });
+          wrap.appendChild(b);
+        }
+        for(let r=0;r<4;r++)for(let side=0;side<2;side++){
+          const b=document.createElement('button');
+          const live=sideLive.has(r+':'+side);
+          b.className='entry'+(live?' live':isSide?'':' hid');
+          b.textContent=side?'◀':'▶';
+          if(live&&suitColor) b.style.color=suitColor;
+          b.style.gridRow=gpos(r); b.style.gridColumn=side?7:1;
+          b.disabled=!live;
+          b.addEventListener('click',()=>{
+            const m=moves.find(m=>m.kind==='side'&&m.r===r&&m.side===side);
+            if(m) place(sel,m.landing);
+          });
+          wrap.appendChild(b);
+        }
+      }
+      for(let i=0;i<nn;i++){
+        const el=document.createElement('div');
+        el.className='cell'+(frozen.has(i)?' frozen':'')+(cellLive.has(i)?' legal':'');
+        el.dataset.idx=i;
+        if(grid[i]) el.innerHTML=cardHTML(grid[i]);
+        if(lane.has(i)&&suitColor) el.style.boxShadow=`inset 0 0 0 2px ${suitColor}`;
+        el.style.gridRow=gpos(row(i)); el.style.gridColumn=gpos(col(i));
+        el.addEventListener('click',()=>{
+          if(!c.physics) placeClassic(i);
+          else if(cellLive.has(i)) place(sel,i);
+        });
+        wrap.appendChild(el);
+      }
+      const lu=$('ftLineup');
+      lu.innerHTML='';
+      lu.className=n===9?'lv9chips':'';
+      lineup.forEach((cd,idx)=>{
+        const ch=document.createElement('button');
+        ch.className='chip'+(idx===sel?' sel':'');
+        ch.innerHTML=cardHTML(cd);
+        ch.addEventListener('click',()=>{sel=idx===sel?null:idx; hintMsg=null; render();});
+        lu.appendChild(ch);
+      });
+      $('ftUndo').style.display=c.physics?'':'none';
+      $('ftUndo').disabled=undoStack.length===0;
+      renderTop();
+    }
+    $('ftNew').addEventListener('click',newDeal);
+    $('lvGreen').addEventListener('click',()=>setLevel('green'));
+    $('lvBlue').addEventListener('click',()=>setLevel('blue'));
+    $('lvBlack').addEventListener('click',()=>setLevel('black'));
+    $('lvDblack').addEventListener('click',()=>setLevel('dblack'));
+    $('ftHintBtn').addEventListener('click',hint);
+    $('ftUndo').addEventListener('click',undo);
+    $('ftRestart').addEventListener('click',restart);
+    return {newDeal,undo,restart,movesFor,solve,landSki,landBoard,landSkate,
+      completable,setLevel,placeClassic,hint,
+      get state(){return {grid,lineup,frozen:[...frozen],sel,undoDepth:undoStack.length,level,strikes};},
+      get deal(){return deal;},
+      place:(ci,L)=>place(ci,L),
+      select:i=>{sel=i;render();}};
+  })();
+
+  /* ================= AVALANCHE ================= */
+  const AV=(()=>{
+    const COLS=5, ROWS=6;
+    let grid,queue,score,meters,arm,over;
+    const idx=(r,c)=>r*COLS+c;
+    function spawn(){
+      const roll=Math.random();
+      const v=roll<0.55?0:roll<0.85?1:2; // value index: 0 => I
+      return {v,s:Math.floor(Math.random()*4)};
+    }
+    function newRun(){
+      grid=new Array(COLS*ROWS).fill(null);
+      queue=[spawn(),spawn()];
+      score=0; over=false; arm=null;
+      meters=[0,0,0,0];
+      render();
+    }
+    function gravity(){
+      for(let c=0;c<COLS;c++){
+        const stack=[];
+        for(let r=ROWS-1;r>=0;r--) if(grid[idx(r,c)]) stack.push(grid[idx(r,c)]);
+        for(let r=ROWS-1;r>=0;r--) grid[idx(r,c)]=stack[ROWS-1-r]||null;
+      }
+    }
+    function findPair(){
+      for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+        const t=grid[idx(r,c)];
+        if(!t) continue;
+        if(c+1<COLS){const u=grid[idx(r,c+1)]; if(u&&u.v===t.v) return [idx(r,c),idx(r,c+1)];}
+        if(r+1<ROWS){const u=grid[idx(r+1,c)]; if(u&&u.v===t.v) return [idx(r,c),idx(r+1,c)];}
+      }
+      return null;
+    }
+    function resolve(){
+      for(;;){
+        gravity();
+        const pair=findPair();
+        if(!pair) break;
+        const [a,b]=pair;
+        const ta=grid[a], tb=grid[b];
+        const same=ta.s===tb.s;
+        const keep=(a>b)?a:b; // keep the lower tile
+        const drop=(keep===a)?b:a;
+        if(ta.v>=9){ // X + X -> summit clear
+          grid[a]=null; grid[b]=null;
+          score+=500;
+        }else{
+          const t=grid[keep];
+          t.v+=1;
+          if(same){t.s=ta.s; meters[t.s]=Math.min(3,meters[t.s]+1);}
+          grid[drop]=null;
+          score+=(t.v+1)*(t.v+1)*5*(same?2:1);
+        }
+      }
+    }
+    function drop(c){
+      if(over||arm!==null) return false;
+      if(grid[idx(0,c)]) return false;
+      let r=0;
+      while(r+1<ROWS&&!grid[idx(r+1,c)]) r++;
+      grid[idx(r,c)]=queue.shift();
+      queue.push(spawn());
+      resolve();
+      let full=true;
+      for(let cc=0;cc<COLS;cc++) if(!grid[idx(0,cc)]) full=false;
+      render();
+      if(full){
+        over=true;
+        const best=Math.max(score,+(localStorage.getItem('sd_aval_best')||0));
+        localStorage.setItem('sd_aval_best',best);
+        overlay('Buried! 🌨️',`The mountain filled up. Score ${score} — best ${best}.`,
+          [['New run',newRun],['Menu',()=>show('menu')]]);
+      }
+      return true;
+    }
+    function usePower(cell){
+      const s=arm;
+      arm=null;
+      const r=Math.floor(cell/COLS), c=cell%COLS;
+      const hits=[];
+      if(s===0){for(let rr=0;rr<ROWS;rr++)hits.push(idx(rr,c));}
+      else if(s===2){for(let cc=0;cc<COLS;cc++)hits.push(idx(r,cc));}
+      else if(s===1){hits.push(cell);
+        for(const [dr,dc] of [[-1,-1],[-1,1],[1,-1],[1,1]]){
+          const nr=r+dr,nc=c+dc;
+          if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS)hits.push(idx(nr,nc));
+        }}
+      else hits.push(cell);
+      let n=0;
+      for(const h of hits) if(grid[h]){score+=(grid[h].v+1)*5; grid[h]=null; n++;}
+      if(n===0) return; // nothing cleared, keep charge? no: already disarmed, refund
+      meters[s]=0;
+      resolve();
+      render();
+    }
+    /* rendering */
+    const boardEl=$('avBoard');
+    function render(){
+      boardEl.innerHTML='';
+      for(let i=0;i<COLS*ROWS;i++){
+        const el=document.createElement('div');
+        el.className='cell';
+        if(grid[i]) el.innerHTML=cardHTML(grid[i]);
+        el.addEventListener('click',()=>{
+          if(arm!==null){if(grid[i]||arm===0||arm===2)usePower(i); return;}
+          drop(i%COLS);
+        });
+        boardEl.appendChild(el);
+      }
+      $('avScore').textContent=score;
+      $('avBest').textContent=localStorage.getItem('sd_aval_best')||'0';
+      const q=$('avQueue');
+      q.innerHTML='<span style="font-size:.75rem">Next</span>';
+      queue.forEach(t=>{
+        const ch=document.createElement('span');
+        ch.className='chip';
+        ch.innerHTML=cardHTML(t);
+        q.appendChild(ch);
+      });
+      const pw=$('avPowers');
+      pw.innerHTML='';
+      const names=['clear a column','clear an X shape','clear a row','clear one tile'];
+      SUITS.slice(0,4).forEach((s,i)=>{
+        const b=document.createElement('button');
+        b.className='pw'+(meters[i]>=3?' ready':'')+(arm===i?' arm':'');
+        b.innerHTML=`<span>${s.sym}</span><span class="pips">${'●'.repeat(meters[i])}${'○'.repeat(3-meters[i])}</span>`;
+        b.disabled=meters[i]<3&&arm!==i;
+        b.addEventListener('click',()=>{arm=arm===i?null:i; render();});
+        pw.appendChild(b);
+      });
+      $('avHint').textContent=arm!==null
+        ?`Armed: ${SUITS[arm].sym} will ${names[arm]} — tap the board.`
+        :'Tap a column to drop.';
+    }
+    $('avNew').addEventListener('click',newRun);
+    return {newRun,drop,usePower,resolve,
+      get state(){return {grid,queue,score,meters,arm,over};},
+      _set(g){grid=g;}};
+  })();
+
+  /* wiring */
+  $('goTracks').addEventListener('click',()=>{show('tracks'); FT.newDeal();});
+  $('goAval').addEventListener('click',()=>{show('aval'); AV.newRun();});
+  refreshStats();
+  window.tracks=FT;
+  window.aval=AV;
+  window._show=show;
+
+  /* embed support: when iframed (e.g. idontcry.com/snowdoku), report height */
+  if(window.parent!==window){
+    document.body.style.minHeight='0';
+    let last=0;
+    const post=()=>{
+      const h=document.body.scrollHeight;
+      if(h!==last){last=h; window.parent.postMessage({type:'snowdoku-height',h},'*');}
+    };
+    new MutationObserver(post).observe(document.body,{childList:true,subtree:true,attributes:true});
+    window.addEventListener('load',post);
+    post();
+    // the host page's listener may attach after our first post
+    setTimeout(()=>{last=0;post();},300);
+    setTimeout(()=>{last=0;post();},1200);
+  }
+})();
+</script>
+</body>
+</html>
