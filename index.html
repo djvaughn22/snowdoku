@@ -8,6 +8,18 @@
 <meta property="og:title" content="SnowDoku — winter brain games">
 <meta property="og:description" content="Sudoku × winter sports. Four slopes from bunny hill to double black diamond, plus Avalanche — a beat-the-clock merge game.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏔️</text></svg>">
+<meta name="theme-color" content="#0b1220">
+<script>
+/* PWA wiring — only on snowdoku.com itself (not the idontcry embed):
+   manifest + icons + offline service worker = installable app. */
+if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
+  const l1=document.createElement('link'); l1.rel='manifest'; l1.href='/manifest.json';
+  const l2=document.createElement('link'); l2.rel='apple-touch-icon'; l2.href='/icons/apple-touch-icon.png';
+  document.head.append(l1,l2);
+  if('serviceWorker' in navigator)
+    addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+}
+</script>
 <style>
   :root{
     --bg:#0b1220; --panel:#141d2e; --border:#26324c;
