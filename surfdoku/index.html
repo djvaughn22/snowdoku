@@ -68,24 +68,6 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   .om-bar .right{display:flex; align-items:center; gap:10px;}
   .om-bar .site{font-size:.7rem; font-weight:900; letter-spacing:.18em; color:var(--dim);}
   #themeBtn{border-radius:50%; width:36px; height:36px; padding:0; font-size:1rem;}
-  .om-menu{position:relative;}
-  .om-menu summary{
-    list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;
-    border-radius:50px; border:1px solid var(--border); background:var(--btn);
-    color:var(--ink); padding:8px 15px; font-size:.82rem; font-weight:900;
-  }
-  .om-menu summary::-webkit-details-marker{display:none;}
-  .om-menu summary::marker{content:"";}
-  .om-menu nav{
-    position:absolute; right:0; top:calc(100% + 8px); z-index:60; width:230px;
-    max-height:70vh; overflow-y:auto; background:var(--panel);
-    border:1px solid var(--border); border-radius:14px; padding:8px;
-  }
-  .om-menu nav a{
-    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:9px;
-    color:var(--ink); font-size:.9rem; font-weight:700; text-decoration:none;
-  }
-  .om-menu nav a:hover{background:var(--btn);}
   .om-foot{
     width:100%; margin-top:auto; background:var(--panel); border-top:1px solid var(--border);
     font-family:system-ui,sans-serif; font-size:.8rem; color:var(--dim);
@@ -252,23 +234,6 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
     <span class="right">
       <span class="site">SNOWDOKU.COM</span>
       <button id="themeBtn" title="Light / dark">🌙</button>
-      <details class="om-menu">
-        <summary aria-label="Open Mirror family menu">☰ Menu</summary>
-        <nav>
-          <a href="https://openmirrorllc.com">🪞 Open Mirror Home</a>
-          <a href="https://crossheartpray.com">✝️ CrossHeartPray</a>
-          <a href="https://thedjcares.com">🎵 TheDJCares</a>
-          <a href="https://dontclonemetom.com">🐶 DontCloneMeTom</a>
-          <a href="https://idontcry.com">😂 iDontCry</a>
-          <a href="https://stepinthering.com">🥊 StepInTheRing</a>
-          <a href="https://whatamiai.com">🤖 WhatAmIAI</a>
-          <a href="https://pleasebeready.com">🧰 PleaseBeReady</a>
-          <a href="https://watchednotwatched.com">🎬 WatchedNotWatched</a>
-          <a href="https://fambookagram.com">👨‍👩‍👧‍👦 Fambookagram</a>
-          <a href="https://friendbookagram.com">🫂 Friendbookagram</a>
-          <a href="https://openmirrorllc.com/about-open-mirror">ℹ️ About Open Mirror</a>
-        </nav>
-      </details>
     </span>
   </div>
 </header>
