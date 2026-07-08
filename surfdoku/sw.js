@@ -1,6 +1,6 @@
 // SnowDoku offline cache — the whole game is one file.
-const CACHE = 'snowdoku-v1';
-const ASSETS = ['/', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
+const CACHE = 'surfdoku-v1';
+const ASSETS = ['/surfdoku/', '/surfdoku/manifest.json', '/surfdoku/icons/icon-192.png', '/surfdoku/icons/icon-512.png'];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });

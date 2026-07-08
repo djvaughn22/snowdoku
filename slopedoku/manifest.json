@@ -2,27 +2,28 @@
   "name": "SlopeDoku \u2014 winter brain games (an OpenDoku game)",
   "short_name": "SlopeDoku",
   "description": "SlopeDoku, the first OpenDoku game: winter brain games in Roman numerals. Sudoku where every tile is two puzzles at once, plus Avalanche.",
-  "start_url": "/",
+  "start_url": "/slopedoku/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0b1220",
   "theme_color": "#0b1220",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
+      "src": "/slopedoku/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/slopedoku/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512-maskable.png",
+      "src": "/slopedoku/icons/icon-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "scope": "/slopedoku/"
 }

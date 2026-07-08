@@ -1,0 +1,29 @@
+{
+  "name": "SurfDoku \u2014 beach brain games (an OpenDoku game)",
+  "short_name": "SurfDoku",
+  "description": "SurfDoku, the second OpenDoku game: beach brain games in Roman numerals. Sudoku where every tile is two puzzles at once, plus Riptide.",
+  "start_url": "/surfdoku/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#071c2b",
+  "theme_color": "#071c2b",
+  "icons": [
+    {
+      "src": "/surfdoku/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/surfdoku/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/surfdoku/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "scope": "/surfdoku/"
+}

@@ -2,245 +2,64 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>SlopeDoku — winter brain games in Roman numerals · an OpenDoku game</title>
-<meta name="description" content="SlopeDoku, the first OpenDoku game: winter brain games in Roman numerals. Fresh Tracks — sudoku where every tile is two puzzles at once, from bunny slope to double black diamond. Avalanche — beat-the-clock merges.">
-<meta property="og:title" content="SlopeDoku — an OpenDoku game">
-<meta property="og:description" content="Sudoku × winter sports. Four slopes from bunny hill to double black diamond, plus Avalanche. First of many OpenDoku puzzle games.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏔️</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenDoku.com — puzzle games where every tile is two puzzles</title>
+<meta name="description" content="OpenDoku, the Open Mirror puzzle-games series. Every tile is two puzzles at once. SlopeDoku (winter) and SurfDoku (beach) — more dokus on the way.">
+<meta property="og:title" content="OpenDoku — the puzzle-games family">
+<meta property="og:description" content="Every tile is two puzzles at once. SlopeDoku, SurfDoku, and more dokus to come. An Open Mirror LLC series.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧩</text></svg>">
 <meta name="theme-color" content="#0b1220">
-<script>
-/* PWA wiring — only on snowdoku.com itself (not the idontcry embed):
-   manifest + icons + offline service worker = installable app. */
-if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hostname)){
-  /* PWA activates on the production domains only (keep in sync with GAME.domain
-     on rename — this guard runs before the THEME ZONE exists) */
-  const l1=document.createElement('link'); l1.rel='manifest'; l1.href='/manifest.json';
-  const l2=document.createElement('link'); l2.rel='apple-touch-icon'; l2.href='/icons/apple-touch-icon.png';
-  document.head.append(l1,l2);
-  if('serviceWorker' in navigator)
-    addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
-}
-</script>
 <style>
   :root{
     --bg:#0b1220; --panel:#141d2e; --border:#26324c;
     --ink:#e8edf5; --dim:#94a3b8; --accent:#7dd3fc;
-    --cell:#0e1930; --cellbd:#2a3a58; --frozen:#24405f; --frozenbd:#3f6288;
-    --good:#1c3a2b; --goodbd:#3f7a52; --ok:#7fe08a;
     --btn:#1e2f4d; --btnbd:#3a5a80;
-    --ski:#5ab0ff; --board:#ffab4a; --skate:#c99aff; --shoe:#7fe08a;
-    --sled:#ff8fb1; --hockey:#66e0d5; --curl:#d8c27a; --alpine:#9db2ff; --snowman:#dceeff;
   }
   [data-theme="light"]{
     --bg:#fefcf9; --panel:#ffffff; --border:#e4e4e7;
     --ink:#1c1917; --dim:#57534e; --accent:#0284c7;
-    --cell:#f4f4f5; --cellbd:#d6d3d1; --frozen:#dbeafe; --frozenbd:#93c5fd;
-    --good:#dcfce7; --goodbd:#4ade80; --ok:#15803d;
     --btn:#f4f4f5; --btnbd:#d4d4d8;
-    --ski:#1d4ed8; --board:#b45309; --skate:#7c3aed; --shoe:#15803d;
-    --sled:#be185d; --hockey:#0f766e; --curl:#92400e; --alpine:#4338ca; --snowman:#0369a1;
   }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  *{box-sizing:border-box;}
   body{
     margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
     font-family:Georgia,'Times New Roman',serif;
     display:flex; flex-direction:column; align-items:center;
   }
-  a{color:var(--accent);}
-  button{
-    font-family:inherit; font-size:.92rem; color:var(--ink);
-    background:var(--btn); border:1px solid var(--btnbd); border-radius:10px;
-    padding:10px 14px; cursor:pointer;
-  }
-  button:active{transform:translateY(1px);}
-  button:disabled{opacity:.3; cursor:default;}
-  /* ---- Open Mirror chrome ---- */
-  .om-bar{
-    width:100%; background:var(--panel); border-bottom:1px solid var(--border);
-    font-family:system-ui,sans-serif;
-  }
-  .om-in{
-    max-width:960px; margin:0 auto; padding:12px 18px;
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-  }
+  button{font-family:inherit; color:var(--ink); background:var(--btn); border:1px solid var(--btnbd); border-radius:10px; padding:10px 14px; cursor:pointer;}
+  .om-bar{width:100%; background:var(--panel); border-bottom:1px solid var(--border); font-family:system-ui,sans-serif;}
+  .om-in{max-width:960px; margin:0 auto; padding:12px 18px; display:flex; align-items:center; justify-content:space-between; gap:10px;}
   .om-bar a{font-weight:800; font-size:.95rem; color:var(--ink); text-decoration:none;}
   .om-bar .right{display:flex; align-items:center; gap:10px;}
   .om-bar .site{font-size:.7rem; font-weight:900; letter-spacing:.18em; color:var(--dim);}
   #themeBtn{border-radius:50%; width:36px; height:36px; padding:0; font-size:1rem;}
   .om-menu{position:relative;}
-  .om-menu summary{
-    list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;
-    border-radius:50px; border:1px solid var(--border); background:var(--btn);
-    color:var(--ink); padding:8px 15px; font-size:.82rem; font-weight:900;
-  }
+  .om-menu summary{list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; border-radius:50px; border:1px solid var(--border); background:var(--btn); color:var(--ink); padding:8px 15px; font-size:.82rem; font-weight:900;}
   .om-menu summary::-webkit-details-marker{display:none;}
   .om-menu summary::marker{content:"";}
-  .om-menu nav{
-    position:absolute; right:0; top:calc(100% + 8px); z-index:60; width:230px;
-    max-height:70vh; overflow-y:auto; background:var(--panel);
-    border:1px solid var(--border); border-radius:14px; padding:8px;
-  }
-  .om-menu nav a{
-    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:9px;
-    color:var(--ink); font-size:.9rem; font-weight:700; text-decoration:none;
-  }
+  .om-menu nav{position:absolute; right:0; top:calc(100% + 8px); z-index:60; width:230px; max-height:70vh; overflow-y:auto; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:8px;}
+  .om-menu nav a{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:9px; color:var(--ink); font-size:.9rem; font-weight:700; text-decoration:none;}
   .om-menu nav a:hover{background:var(--btn);}
-  .om-foot{
-    width:100%; margin-top:auto; background:var(--panel); border-top:1px solid var(--border);
-    font-family:system-ui,sans-serif; font-size:.8rem; color:var(--dim);
-  }
+  .app{width:100%; max-width:430px; padding:14px 14px 48px; margin:0 auto;}
+  .hero{text-align:center; padding:26px 0 10px;}
+  .brand{width:76px; height:76px; margin:0 auto 12px; border-radius:24px; background:var(--panel); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:2.5rem;}
+  h1{font-size:2.1rem; margin:0;}
+  h1 span{color:var(--accent);}
+  .series{margin:6px 0 0; font-size:.72rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); font-family:system-ui,sans-serif;}
+  .tag{margin:8px 0 0; font-size:.95rem; font-weight:bold; color:var(--accent);}
+  .sub{margin:5px 0 0; font-size:.82rem; color:var(--dim); font-style:italic;}
+  .game{display:block; background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:18px; margin-top:14px; text-decoration:none; color:var(--ink);}
+  .game:hover{border-color:var(--accent);}
+  .game .row{display:flex; align-items:center; gap:14px;}
+  .game .ico{font-size:2.2rem;}
+  .game h2{margin:0; font-size:1.25rem;}
+  .game p{margin:4px 0 0; font-size:.85rem; color:var(--dim); line-height:1.5;}
+  .game .go{margin-left:auto; color:var(--accent); font-weight:bold; font-size:1.2rem;}
+  .next{border-style:dashed; text-align:center; color:var(--dim); font-size:.85rem; padding:20px;}
+  .om-foot{width:100%; margin-top:auto; background:var(--panel); border-top:1px solid var(--border); font-family:system-ui,sans-serif; font-size:.8rem; color:var(--dim);}
   .om-foot .om-in{display:block; text-align:center; padding:24px 18px 28px;}
   .om-foot a{text-decoration:none; font-weight:900; color:var(--dim);}
-  .om-foot .icons{text-decoration:none;}
   .om-foot p{margin:5px 0;}
-  body.embedded .om-bar, body.embedded .om-foot, body.embedded .hero{display:none;}
-  /* ---- hero + tabs ---- */
-  .app{width:100%; max-width:430px; padding:14px 14px 48px; margin:0 auto;}
-  .hero{text-align:center; padding:22px 0 6px;}
-  .brand{
-    width:76px; height:76px; margin:0 auto 12px; border-radius:24px;
-    background:var(--panel); border:2px solid var(--accent);
-    display:flex; align-items:center; justify-content:center; font-size:2.5rem;
-  }
-  .hero h1{font-size:2.1rem; margin:0; letter-spacing:.5px;}
-  .hero h1 span{color:var(--accent);}
-  .hero .series{margin:6px 0 0; font-size:.72rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); font-family:system-ui,sans-serif;}
-  .hero .tag{margin:7px 0 0; font-size:.95rem; font-weight:bold; color:var(--accent);}
-  .hero .sub{margin:5px 0 0; font-size:.82rem; color:var(--dim); font-style:italic;}
-  .tabs{display:flex; gap:8px; margin:18px 0 14px;}
-  .tabs button{flex:1; padding:14px 6px; font-size:1rem; border-radius:12px;}
-  .tabs button.on{border-color:var(--accent); color:var(--accent); font-weight:bold;}
-  .screen{display:none;}
-  .screen.on{display:block;}
-  header.game{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px;}
-  header.game h2{font-size:1.15rem; margin:0;}
-  .c-ski{color:var(--ski);} .c-board{color:var(--board);}
-  .c-skate{color:var(--skate);} .c-shoe{color:var(--shoe);}
-  .c-sled{color:var(--sled);} .c-hockey{color:var(--hockey);} .c-curl{color:var(--curl);}
-  .c-alpine{color:var(--alpine);} .c-snowman{color:var(--snowman);}
-  /* ---- slope symbols ---- */
-  .shp{display:inline-block; width:13px; height:13px; vertical-align:middle;}
-  .shpC{border-radius:50%; background:#4ade80;}
-  .shpS{border-radius:2px; background:#38bdf8;}
-  .shpD{width:11px; height:11px; border-radius:2px; background:#0f172a; border:1.5px solid #94a3b8; transform:rotate(45deg);}
-  .dbl .shpD:first-child{margin-right:4px;}
-  /* ---- tiles: sport icon reads bigger than the numeral ---- */
-  #ftWrap{
-    display:grid; gap:4px; background:var(--panel); padding:8px; border-radius:14px;
-    border:1px solid var(--border);
-  }
-  .cell{
-    aspect-ratio:1; border-radius:8px; background:var(--cell); border:1px solid var(--cellbd);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    user-select:none; cursor:pointer;
-  }
-  .cell .suit{font-size:1.3rem; line-height:1.15;}
-  .cell .num{font-weight:bold; font-size:.92rem; line-height:1;}
-  .cell.frozen{background:var(--frozen); border-color:var(--frozenbd);}
-  .cell.legal{background:var(--good); border-color:var(--goodbd);}
-  .cell.shake{animation:shake .3s;}
-  @keyframes shake{
-    0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);}
-  }
-  .modeOn{border-color:var(--ok); color:var(--ok);}
-  #ftStrikes{color:#ffab4a; font-weight:bold;}
-  #ftWins{color:var(--dim); font-size:.78rem; font-weight:bold;}
-  #ftWrap.lv2 .cell .suit{font-size:2.4rem;}
-  #ftWrap.lv2 .cell .num{font-size:1.6rem;}
-  #ftWrap.lv9{gap:2px; padding:5px;}
-  #ftWrap.lv9 .cell{border-radius:4px;}
-  #ftWrap.lv9 .cell.boxB{filter:brightness(1.28);}
-  #ftWrap.lv9 .cell .suit{font-size:.82rem; line-height:1;}
-  #ftWrap.lv9 .cell .num{font-size:.56rem;}
-  #ftWrap.lv9 .cell .num.long{font-size:.48rem; letter-spacing:-.5px;}
-  #ftWrap.lv9.iconsOnly .cell .suit.solo{font-size:1.5rem;}
-  .cell .suit.solo{font-size:1.9rem;}
-  #ftLineup.iconsOnly .chip .suit.solo{font-size:1.5rem;}
-  #ftLineup{
-    display:flex; flex-wrap:wrap; gap:6px; background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:14px; padding:10px; margin-top:12px; min-height:56px;
-  }
-  .chip{
-    width:44px; height:54px; border-radius:8px; background:var(--cell);
-    border:1px solid var(--cellbd); display:flex; flex-direction:column;
-    align-items:center; justify-content:center; cursor:pointer;
-  }
-  .chip .suit{font-size:1.2rem; line-height:1.15;}
-  .chip .num{font-weight:bold; font-size:.82rem; line-height:1;}
-  .chip.sel{border:2px solid var(--ok); background:var(--good);}
-  #ftLineup.lv9chips{gap:4px;}
-  #ftLineup.lv9chips .chip{width:34px; height:42px;}
-  #ftLineup.lv9chips .chip .suit{font-size:.85rem;}
-  #ftLineup.lv9chips .chip .num{font-size:.6rem;}
-  .hintFlash{outline:3px solid #ffd76a; outline-offset:-2px;}
-  .bar{display:flex; gap:8px; margin-top:12px; align-items:center;}
-  .hint{font-size:.88rem; color:var(--dim); margin-top:10px; min-height:1.25em;}
-  .objective{
-    margin:0 0 10px; padding:10px 14px; border-radius:12px;
-    background:var(--panel); border:1px solid var(--border);
-    font-size:.85rem; color:var(--dim);
-  }
-  .objective b{color:var(--ink);}
-  /* ---- avalanche ---- */
-  #avBoardWrap{position:relative;}
-  #avArrows{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px; margin-bottom:5px;}
-  #avArrows button{padding:7px 0; font-size:1rem; border-radius:8px; color:var(--accent);}
-  #avBoard{
-    display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px;
-    background:var(--panel); border:1px solid var(--border); padding:8px; border-radius:14px;
-  }
-  #avBoard .cell{border-radius:6px;}
-  #avBoard .cell.laneB{filter:brightness(1.22);}
-  #avBoard .cell .suit{font-size:1.15rem;}
-  #avBoard .cell .num{font-size:.78rem;}
-  #avBoard .cell .num.long{font-size:.64rem;}
-  .pts{
-    position:absolute; z-index:5; pointer-events:none;
-    font-family:system-ui,sans-serif; font-weight:900; font-size:.95rem; color:var(--ok);
-    animation:rise .95s ease-out forwards; text-shadow:0 1px 4px rgba(0,0,0,.5);
-  }
-  @keyframes rise{from{opacity:1; transform:translateY(0);} to{opacity:0; transform:translateY(-38px);}}
-  #avReady{
-    background:var(--panel); border:1px solid var(--border); border-radius:14px;
-    padding:22px 20px; text-align:center;
-  }
-  #avReady h3{margin:0 0 8px; font-size:1.25rem;}
-  #avReady p{margin:0 0 6px; font-size:.92rem; color:var(--dim); line-height:1.55;}
-  #avReady ol{margin:10px auto 16px; padding-left:22px; max-width:300px; text-align:left; font-size:.92rem; color:var(--dim); line-height:1.7;}
-  #avReady b{color:var(--ink);}
-  #avStart{font-size:1.1rem; padding:13px 34px; border-color:var(--accent); color:var(--accent); font-weight:bold; border-radius:50px;}
-  .avTop{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:.95rem; color:var(--dim);}
-  .avTop b{color:var(--ink);}
-  .avNow{
-    display:flex; align-items:center; gap:12px; background:var(--panel);
-    border:1px solid var(--border); border-radius:14px; padding:10px 12px; margin-bottom:10px;
-  }
-  .avNow .chip{cursor:default;}
-  .avNow .cur{width:54px; height:64px; border:2px solid var(--accent);}
-  .avNow .cur .suit{font-size:1.5rem;}
-  .avNow .cur .num{font-size:1rem;}
-  .avNow .meta{flex:1;}
-  .avNow .lbl{font-size:.66rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); font-family:system-ui,sans-serif;}
-  #avTimer{height:8px; border-radius:6px; background:var(--cell); border:1px solid var(--cellbd); overflow:hidden; margin-top:6px;}
-  #avTimerBar{height:100%; width:100%; background:var(--accent); transition:width .1s linear;}
-  #avLevel{font-weight:bold; color:var(--accent);}
-  /* ---- overlay + details ---- */
-  #overlay{position:fixed; inset:0; background:rgba(8,14,24,.82); display:flex; align-items:center; justify-content:center; z-index:10;}
-  #overlay[hidden]{display:none;}
-  .ov{background:var(--panel); border:1px solid var(--btnbd); border-radius:16px; padding:26px 30px; text-align:center; max-width:300px;}
-  .ov h2{margin:0 0 8px; font-size:1.4rem;}
-  .ov p{color:var(--dim); font-size:.9rem; margin:0 0 18px;}
-  .ov .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
-  @media (prefers-reduced-motion: reduce){
-    .cell.shake{animation:none;}
-    .pts{animation:none;}
-    #avTimerBar{transition:none;}
-  }
-  details{margin-top:14px; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 16px; font-size:.9rem; color:var(--dim);}
-  details summary{cursor:pointer; color:var(--ink); font-size:1rem; font-weight:bold; padding:2px 0;}
-  details li{margin:9px 0; line-height:1.55;}
 </style>
 </head>
 <body data-theme="dark">
@@ -249,7 +68,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
   <div class="om-in">
     <a href="https://openmirrorllc.com" target="_blank" rel="noopener noreferrer">Open Mirror LLC</a>
     <span class="right">
-      <span class="site">SNOWDOKU.COM</span>
+      <span class="site">OPENDOKU.COM</span>
       <button id="themeBtn" title="Light / dark">🌙</button>
       <details class="om-menu">
         <summary aria-label="Open Mirror family menu">☰ Menu</summary>
@@ -260,6 +79,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
           <a href="https://dontclonemetom.com">🐶 DontCloneMeTom</a>
           <a href="https://idontcry.com">😂 iDontCry</a>
           <a href="https://stepinthering.com">🥊 StepInTheRing</a>
+          <a href="https://opendoku.com">🧩 OpenDoku</a>
           <a href="https://whatamiai.com">🤖 WhatAmIAI</a>
           <a href="https://pleasebeready.com">🧰 PleaseBeReady</a>
           <a href="https://watchednotwatched.com">🎬 WatchedNotWatched</a>
@@ -273,915 +93,61 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
 </header>
 
 <div class="app">
-
   <div class="hero">
-    <div class="brand" aria-hidden="true">🏔️</div>
-    <h1>SlopeDoku</h1>
-    <p class="series" id="heroSeries">An OpenDoku game · Open Mirror LLC</p>
-    <p class="tag">Winter brain games in Roman numerals</p>
-    <p class="sub">Every tile is two puzzles — the numeral and the sport must both fit.</p>
+    <div class="brand" aria-hidden="true">🧩</div>
+    <h1>OpenDoku<span>.com</span></h1>
+    <p class="series">An Open Mirror LLC series</p>
+    <p class="tag">Puzzle games where every tile is two puzzles</p>
+    <p class="sub">Pick a world. Same brain, different weather.</p>
   </div>
 
-  <div class="tabs">
-    <button id="tabTracks">⛰️ Fresh Tracks</button>
-    <button id="tabAval">❄️ Avalanche</button>
-  </div>
-
-  <!-- ============ FRESH TRACKS ============ -->
-  <div id="tracks" class="screen">
-    <header class="game">
-      <h2>Fresh Tracks</h2>
-      <button id="ftNew">New deal</button>
-    </header>
-    <div class="bar" style="margin:0 0 10px">
-      <button id="lvGreen" title="Green — learn on 4 squares"><span class="shp shpC"></span></button>
-      <button id="lvBlue" title="Blue — 4×4"><span class="shp shpS"></span></button>
-      <button id="lvBlack" title="Black diamond — 9×9, icons only"><span class="shp shpD"></span></button>
-      <button id="lvDblack" title="Double black — 9×9, numerals AND sports" class="dbl"><span class="shp shpD"></span><span class="shp shpD"></span></button>
-      <button id="ftHintBtn" title="Coach — show me a move">💡</button>
-      <span id="ftWins" style="margin-left:auto"></span>
-      <span id="ftStrikes" style="font-size:1.05rem;letter-spacing:4px"></span>
+  <a class="game" href="/slopedoku/">
+    <div class="row">
+      <span class="ico">🏔️</span>
+      <span>
+        <h2>SlopeDoku</h2>
+        <p>Winter brain games in Roman numerals — bunny slope to double black diamond, plus Avalanche.</p>
+      </span>
+      <span class="go">→</span>
     </div>
-    <div id="ftWrap"></div>
-    <div class="hint" id="ftHint">Pick an athlete below.</div>
-    <div id="ftLineup"></div>
-    <div class="bar">
-      <button id="ftRestart">Restart deal</button>
+  </a>
+
+  <a class="game" href="/surfdoku/">
+    <div class="row">
+      <span class="ico">🌞</span>
+      <span>
+        <h2>SurfDoku</h2>
+        <p>Beach brain games in Roman numerals — kiddie pool to double red flag, plus Riptide.</p>
+      </span>
+      <span class="go">→</span>
     </div>
-    <details>
-      <summary>How to play</summary>
-      <ul>
-        <li>Every tile is two puzzles at once — the <b>numeral</b> and the <b>sport</b> both have to fit. Pick a card below, then tap where it goes.</li>
-        <li><span class="shp shpC"></span> <b>Green:</b> the bunny slope — I, II, III and IV in four different suits. Every card fits anywhere; just learn to pick up and place. The rules kick in on blue.</li>
-        <li><span class="shp shpS"></span> <b>Blue:</b> 4&times;4 — every row, column and 2&times;2 box needs each numeral <b>I&ndash;IV</b> and each sport once.</li>
-        <li><span class="shp shpD"></span> <b>Black diamond:</b> 9&times;9, icons only — every row, column and 3&times;3 box needs <b>all nine winter sports</b>. Big clean tiles, one constraint, real sudoku depth.</li>
-        <li><span class="shp shpD"></span><span class="shp shpD"></span> <b>Double black:</b> the true summit — 9&times;9 where <b>numerals I&ndash;IX AND nine sports</b> are both sudoku-valid at once. Two puzzles in every tile.</li>
-        <li>The lineup is exactly the right cards to finish the board, and <b>you never have to guess — guaranteed</b>. From the first tile to the last, there is always a cell that accepts exactly one of your cards, or a card with only one home. Start where a row, column or box is fullest, and if you can&rsquo;t see it, 💡 will.</li>
-        <li>A move that breaks the rules — or would make the mountain impossible to finish — gets an <b>✗</b>, but the card comes back to you to try somewhere else. Mistakes add up: three ✗ in one run and you&rsquo;re out. Every deal is solvable.</li>
-        <li>💡 is your coach — it glows a correct card and spot when you&rsquo;re stuck.</li>
-        <li>Your game saves itself — close the app, come back, keep climbing. <button id="resetAll" style="padding:6px 12px;font-size:.8rem">Reset all progress</button></li>
-      </ul>
-    </details>
-  </div>
+  </a>
 
-  <!-- ============ AVALANCHE ============ -->
-  <div id="aval" class="screen">
-    <header class="game">
-      <h2>Avalanche</h2>
-      <button id="avNew">New run</button>
-    </header>
-    <p class="objective">🎯 <b>The goal:</b> keep the mountain from filling up. Matching numerals melt together — merge, score, survive.</p>
-
-    <div id="avReady">
-      <h3>❄️ Ready to ride?</h3>
-      <p>Tiles fall onto the mountain, one at a time.</p>
-      <ol>
-        <li>Tap a <b>▼ lane</b> to drop the tile where you want it.</li>
-        <li>Touching tiles with the <b>same numeral merge</b> into a bigger one.</li>
-        <li>Beat the clock — wait too long and the tile drops itself!</li>
-      </ol>
-      <button id="avStart">▶ Start the run</button>
-      <button id="avContinue" hidden style="margin-left:8px">↩ Continue last run</button>
-    </div>
-
-    <div id="avGame" hidden>
-      <div class="avTop">
-        <span>Score <b id="avScore">0</b></span>
-        <span>Best <b id="avBest">0</b></span>
-        <span>Level <b id="avLevel">1</b></span>
-      </div>
-      <div class="avNow">
-        <div class="chip cur" id="avCur"></div>
-        <div class="meta">
-          <div class="lbl">Drop before the clock does</div>
-          <div id="avTimer"><div id="avTimerBar"></div></div>
-        </div>
-        <div>
-          <div class="lbl" style="text-align:center">Next</div>
-          <div class="chip" id="avNext" style="margin-top:2px"></div>
-        </div>
-      </div>
-      <div id="avBoardWrap">
-        <div id="avArrows"></div>
-        <div id="avBoard"></div>
-      </div>
-      <div class="hint" id="avHint">Tap a ▼ lane to drop.</div>
-    </div>
-
-    <details>
-      <summary>How to play</summary>
-      <ul>
-        <li><b>The goal is survival:</b> the run ends when the mountain fills to the top. Merging keeps it clear — and scores.</li>
-        <li>Tap a <b>▼ lane</b> (or anywhere in a column) to drop the tile there <b>before the clock drops it for you</b> somewhere random.</li>
-        <li>Touching tiles with equal numerals merge upward: I+I&rarr;II &hellip; IX+IX&rarr;X. Two X&rsquo;s vanish in a 💥 for a big bonus.</li>
-        <li>Same-sport merges score <b>double</b>, and every point is multiplied by your level.</li>
-        <li>Every 15 drops = next level — the clock gets a little faster. Keep the rhythm.</li>
-      </ul>
-    </details>
-  </div>
-
-  <div id="overlay" hidden>
-    <div class="ov">
-      <h2 id="ovTitle"></h2>
-      <p id="ovMsg"></p>
-      <div class="row" id="ovBtns"></div>
-    </div>
+  <div class="game next">
+    More dokus on the workbench — dream one up at
+    <a href="https://stepinthering.com" style="color:var(--accent); font-weight:bold; text-decoration:none">StepInTheRing.com</a> 🥊
   </div>
 </div>
 
 <footer class="om-foot">
   <div class="om-in">
-    <p>© 2026 <b id="footBrand">SnowDoku<span style="color:var(--accent)">.com</span></b><span id="footTag"> · Winter brain games in Roman numerals</span></p>
+    <p>© 2026 <b>OpenDoku<span style="color:var(--accent)">.com</span></b> · puzzle games where every tile is two puzzles</p>
     <p>
       <a href="https://openmirrorllc.com" target="_blank" rel="noopener noreferrer">OPEN MIRROR LLC</a>
       &nbsp;·&nbsp;
       <a href="https://openmirrorllc.com/about-open-mirror" target="_blank" rel="noopener noreferrer">ABOUT</a>
       &nbsp;·&nbsp;
-      <a class="icons" href="https://crossheartpray.com" target="_blank" rel="noopener noreferrer" title="CrossHeartPray">✝️ ❤️ 🙏</a>
+      <a href="https://crossheartpray.com" target="_blank" rel="noopener noreferrer" title="CrossHeartPray">✝️ ❤️ 🙏</a>
     </p>
   </div>
 </footer>
 
 <script>
 (function(){
-  'use strict';
-  /* ═════════════════════ THEME ZONE — the doku-engine seed ═════════════════
-     To build the next Open Mirror doku (SuitDoku, DogDoku, BibleDoku,
-     ColorDoku...): fork this file, change ONLY this zone plus /icons and
-     manifest.json. Everything below is theme-agnostic engine: board
-     generators (incl. the 9×9 orthogonal-pair construction), unique-solution
-     math, validators, strikes, the 💡 coach, save/resume, timers, PWA.
-     GAME = identity · SUITS = tile categories (9 for the 9×9 board) ·
-     ROMAN = glyph track (10: 9 board glyphs + the merge-cap glyph). */
-  /* RENAME BEFORE LAUNCH? Change productName here — hero, title, bar,
-     footer and dialogs all render from it. Candidates on the table:
-     'Fresh Tracks Doku' · 'SlopeDoku' · 'Avalanche Doku'.
-     A rename must ALSO touch (JS can't reach these for crawlers/installs):
-       1. <head> meta description + og:title/og:description (this file)
-       2. manifest.json — name, short_name, description
-       3. /icons if the brand mark changes
-     Leave alone: localStorage sd_* keys (players' saves) and the
-     'snowdoku-height' postMessage type (embed protocol paired with
-     idontcry's SnowdokuGame.tsx) — internal, not branding. */
-  const GAME={
-    productName:'SlopeDoku',
-    series:'OpenDoku',          // the puzzle-games family — one of many to come
-    domain:'opendoku.com',      // series home; snowdoku.com stays aliased
-    tagline:'Winter brain games in Roman numerals',
-    sub:'Every tile is two puzzles — the numeral and the sport must both fit.',
-    brand:'🏔️'
-  };
-  const SUITS=[
-    {id:'ski',  sym:'🎿'},
-    {id:'board',sym:'🏂'},
-    {id:'skate',sym:'⛸️'},
-    {id:'shoe', sym:'🥾'},
-    {id:'sled', sym:'🛷'},
-    {id:'hockey',sym:'🏒'},
-    {id:'curl', sym:'🥌'},
-    {id:'alpine',sym:'⛷️'},
-    {id:'snowman',sym:'☃️'}
-  ];
-  const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X'];
-  const $=id=>document.getElementById(id);
-  function shuffle(a){
-    for(let i=a.length-1;i>0;i--){
-      const j=Math.floor(Math.random()*(i+1));
-      [a[i],a[j]]=[a[j],a[i]];
-    }
-    return a;
-  }
-  /* sport icon reads a little bigger than the numeral;
-     iconOnly renders just the sport — big and clean (black diamond) */
-  function cardHTML(card,iconOnly){
-    const s=SUITS[card.s];
-    if(iconOnly) return `<span class="suit solo">${s.sym}</span>`;
-    const n=ROMAN[card.n!==undefined?card.n:card.v];
-    return `<span class="suit">${s.sym}</span>`+
-           `<span class="num c-${s.id}${n.length>2?' long':''}">${n}</span>`;
-  }
-
-  /* ---------- theme (Open Mirror standard) ---------- */
-  const themeBtn=$('themeBtn');
-  function applyTheme(t){
-    document.body.dataset.theme=t;
-    document.documentElement.dataset.omTheme=t;
-    themeBtn.textContent=t==='dark'?'🌙':'☀️';
-  }
-  applyTheme(localStorage.getItem('om-theme')==='light'?'light':'dark');
-  themeBtn.addEventListener('click',()=>{
-    const t=document.body.dataset.theme==='dark'?'light':'dark';
-    localStorage.setItem('om-theme',t);
-    applyTheme(t);
-  });
-
-  /* ---------- theme-zone injection: ALL naming renders from GAME ---------- */
-  const TLD='.'+GAME.domain.split('.').pop();
-  document.title=`${GAME.productName} — ${GAME.tagline.toLowerCase()} · an ${GAME.series} game`;
-  document.querySelector('.hero h1').innerHTML=
-    GAME.productName.replace(/Doku$/,'<span>Doku</span>');
-  document.getElementById('heroSeries').textContent=
-    `An ${GAME.series} game · Open Mirror LLC`;
-  document.querySelector('.hero .tag').textContent=GAME.tagline;
-  document.querySelector('.hero .sub').textContent=GAME.sub;
-  document.querySelector('.brand').textContent=GAME.brand;
-  document.querySelector('.om-bar .site').textContent=GAME.domain.toUpperCase();
-  document.getElementById('footBrand').innerHTML=
-    `${GAME.series}<span style="color:var(--accent)">${TLD}</span>`;
-  document.getElementById('footTag').textContent=` · ${GAME.productName} — ${GAME.tagline.toLowerCase()}`;
-
-  /* ---------- tabs ---------- */
-  let tab=null;
-  function show(id){
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-    $(id).classList.add('on');
-    $('tabTracks').classList.toggle('on',id==='tracks');
-    $('tabAval').classList.toggle('on',id==='aval');
-    $('overlay').hidden=true;
-    tab=id;
-    localStorage.setItem('sd_tab',id);
-    if(id==='aval') AV.enter(); else AV.leave();
-    if(id==='tracks') FT.enter();
-  }
-  function overlay(title,msg,btns){
-    $('ovTitle').textContent=title;
-    $('ovMsg').textContent=msg;
-    const row=$('ovBtns'); row.innerHTML='';
-    btns.forEach(([label,fn])=>{
-      const b=document.createElement('button');
-      b.textContent=label;
-      b.addEventListener('click',()=>{$('overlay').hidden=true; fn();});
-      row.appendChild(b);
-    });
-    $('overlay').hidden=false;
-  }
-
-  /* ================= FRESH TRACKS ================= */
-  const FT=(()=>{
-    /* slope ladder: green 2x2 tutorial · blue 4x4 dual · black 9x9 ICONS
-       ONLY (nine sports, one clean constraint) · double black 9x9 DUAL —
-       numerals AND sports, two sudokus at once. (The old "athletes ski to
-       their tiles" movement mode is retired from SlopeDoku and saved as a
-       future OpenDoku game concept — see README.) */
-    const LV={
-      green:{n:2},
-      blue:{n:4,bw:2,bh:2},
-      black:{n:9,bw:3,bh:3,iconsOnly:true},
-      dblack:{n:9,bw:3,bh:3}
-    };
-    let level=localStorage.getItem('sd_tracks_level');
-    if(!LV[level]) level='green';
-    const cfg=()=>LV[level];
-    const N=4; // blue board size (genSolution)
-    const row=i=>Math.floor(i/cfg().n), col=i=>i%cfg().n;
-    function box(i){
-      const c=cfg();
-      if(!c.bw) return i; // green: no boxes — every cell its own
-      return Math.floor(row(i)/c.bh)*(c.n/c.bw)+Math.floor(col(i)/c.bw);
-    }
-    function conflicts(g,i,card){
-      const nn=cfg().n*cfg().n;
-      for(let j=0;j<nn;j++){
-        const c=g[j];
-        if(!c||j===i) continue;
-        if(row(j)===row(i)||col(j)===col(i)||box(j)===box(i))
-          if(c.n===card.n||c.s===card.s) return true;
-      }
-      return false;
-    }
-    /* 4x4 full-solution generator (blue) */
-    function genSolution(){
-      const cells=new Array(16).fill(null);
-      const pairs=[];
-      for(let n=0;n<N;n++)for(let s=0;s<N;s++)pairs.push({n,s});
-      function rec(i,rem){
-        if(i===16) return true;
-        for(const p of shuffle(rem.slice())){
-          if(!conflicts(cells,i,p)){
-            cells[i]=p;
-            if(rec(i+1,rem.filter(q=>q!==p))) return true;
-            cells[i]=null;
-          }
-        }
-        return false;
-      }
-      rec(0,pairs);
-      return cells;
-    }
-    /* green: the bunny slope — I,II,III,IV in four different suits.
-       Nothing can clash, so every card fits anywhere. */
-    function genGreen(){
-      const su=shuffle([0,1,2,3]);
-      return shuffle([0,1,2,3]).map((v,i)=>({n:v,s:su[i]}));
-    }
-    /* black: 9x9 orthogonal sudoku pair via the classic base-3 construction —
-       numerals AND sports are each sudoku-valid, every pair appears once. */
-    function genBlack(){
-      const P=k=>shuffle([...Array(k).keys()]);
-      const pn=P(9), ps=P(9);
-      const rowMap=[], colMap=[];
-      for(const b of P(3)) for(const k of P(3)) rowMap.push(3*b+k);
-      for(const b of P(3)) for(const k of P(3)) colMap.push(3*b+k);
-      const cells=new Array(81);
-      for(let r=0;r<9;r++)for(let c=0;c<9;c++){
-        const rr=rowMap[r], cc=colMap[c];
-        const r1=Math.floor(rr/3), r0=rr%3, c1=Math.floor(cc/3), c0=cc%3;
-        const A=3*((r0+c1)%3)+((r1+c0)%3);
-        const B=3*((r0+2*c1)%3)+((r1+2*c0)%3);
-        cells[r*9+c]={n:pn[A],s:ps[B]};
-      }
-      return cells;
-    }
-    /* how many finished mountains exist from here? (capped count) */
-    function countSolutions(g,cards,cap){
-      let count=0;
-      const nn=cfg().n*cfg().n;
-      function rec(g,cards){
-        if(count>=cap) return;
-        if(cards.length===0){count++;return;}
-        let bestI=-1,bestOpts=null;
-        for(let i=0;i<nn;i++){
-          if(g[i]) continue;
-          const opts=cards.filter(c=>!conflicts(g,i,c));
-          if(opts.length===0) return;
-          if(!bestOpts||opts.length<bestOpts.length){bestI=i;bestOpts=opts;}
-        }
-        if(bestI===-1){count++;return;}
-        const tried=new Set();
-        for(const c of bestOpts){
-          const k=c.n+','+c.s;
-          if(tried.has(k)) continue;
-          tried.add(k);
-          g[bestI]=c;
-          rec(g,cards.filter(x=>x!==c));
-          g[bestI]=null;
-          if(count>=cap) return;
-        }
-      }
-      rec(g.slice(),cards.slice());
-      return count;
-    }
-    /* NO-GUESS guarantee: can the whole board be finished using only
-       forced moves a human can deduce — a cell that accepts exactly one
-       hand card (naked single) or a card with exactly one legal cell
-       (hidden single)? If yes, the puzzle needs zero guessing at every
-       step, and the completion it forces is the unique solution. */
-    function logicSolvable(g0,cards0){
-      const nn=cfg().n*cfg().n;
-      const g=g0.slice();
-      let cards=cards0.slice();
-      while(cards.length){
-        let played=false;
-        for(let i=0;i<nn&&!played;i++){
-          if(g[i]) continue;
-          const fits=cards.filter(c=>!conflicts(g,i,c));
-          const types=new Set(fits.map(c=>c.n+','+c.s));
-          if(fits.length&&types.size===1){g[i]=fits[0]; cards=cards.filter(c=>c!==fits[0]); played=true;}
-        }
-        if(!played){
-          for(let ci=0;ci<cards.length&&!played;ci++){
-            const cells=[];
-            for(let i=0;i<nn;i++) if(!g[i]&&!conflicts(g,i,cards[ci])) cells.push(i);
-            if(cells.length===1){g[cells[0]]=cards[ci]; cards=cards.toSpliced(ci,1); played=true;}
-          }
-        }
-        if(!played) return false;
-      }
-      return true;
-    }
-    /* can the rest of the lineup still fill the board? (pure CSP) */
-    function completable(g,cards){
-      if(cards.length===0) return true;
-      const nn=cfg().n*cfg().n;
-      let bestI=-1,bestOpts=null;
-      for(let i=0;i<nn;i++){
-        if(g[i]) continue;
-        const opts=cards.filter(c=>!conflicts(g,i,c));
-        if(opts.length===0) return false;
-        if(!bestOpts||opts.length<bestOpts.length){bestI=i;bestOpts=opts;}
-      }
-      if(bestI===-1) return true;
-      const tried=new Set();
-      for(const c of bestOpts){
-        const k=c.n+','+c.s;
-        if(tried.has(k)) continue;
-        tried.add(k);
-        g[bestI]=c;
-        if(completable(g,cards.filter(x=>x!==c))){g[bestI]=null;return true;}
-        g[bestI]=null;
-      }
-      return false;
-    }
-    /* state */
-    let grid,frozen,lineup,sel,deal,strikes=0,hintMsg=null;
-    function newDeal(){
-      const c=cfg();
-      let sol,fz;
-      if(level==='green'){
-        sol=genGreen();
-        fz=new Set([Math.floor(Math.random()*4)]);
-      }else if(level==='blue'){
-        sol=genSolution();
-        fz=new Set();
-        for(let b=0;b<4;b++){
-          const opts=[];
-          for(let i=0;i<16;i++) if(box(i)===b) opts.push(i);
-          fz.add(opts[Math.floor(Math.random()*opts.length)]);
-        }
-      }else if(level==='black'){
-        /* icons only: one sport sudoku — big, readable, one constraint */
-        sol=genBlack().map(cd=>({n:cd.s,s:cd.s}));
-        fz=new Set(shuffle([...Array(81).keys()]).slice(0,31));
-      }else{
-        /* double black: the true summit — numerals AND sports at once */
-        sol=genBlack();
-        fz=new Set(shuffle([...Array(81).keys()]).slice(0,31));
-      }
-      /* add clues until the deal is provably NO-GUESS: finishable start to
-         end by forced moves alone (which also makes the solution unique) */
-      if(level!=='green'){
-        const open=shuffle(sol.map((_,i)=>i).filter(i=>!fz.has(i)));
-        let g=sol.map((cd,i)=>fz.has(i)?cd:null);
-        let cards=sol.filter((_,i)=>!fz.has(i));
-        while(open.length&&!logicSolvable(g,cards)){
-          const step=cards.length>40?2:1;
-          for(let k=0;k<step&&open.length;k++){
-            const i=open.pop();
-            fz.add(i);
-          }
-          g=sol.map((cd,i)=>fz.has(i)?cd:null);
-          cards=sol.filter((_,i)=>!fz.has(i));
-        }
-      }
-      const cards=sol.map((cd,i)=>fz.has(i)?null:cd).filter(Boolean)
-        .sort((a,b)=>a.n-b.n||a.s-b.s);
-      deal={g:sol.map((cd,i)=>fz.has(i)?cd:null),cards,fz:[...fz],sol};
-      restart();
-    }
-    /* save/resume: the mountain survives closing the app */
-    function saveFT(){
-      if(!deal) return;
-      try{
-        localStorage.setItem('sd_ft_save',JSON.stringify({level,deal,grid,lineup,strikes}));
-      }catch(e){}
-    }
-    function loadFT(){
-      try{
-        const s=JSON.parse(localStorage.getItem('sd_ft_save'));
-        if(!s||!LV[s.level]||!s.deal||!s.grid||!s.lineup) return false;
-        if(s.grid.length!==LV[s.level].n*LV[s.level].n) return false; // stale save from an older board shape
-        level=s.level;
-        localStorage.setItem('sd_tracks_level',level);
-        deal=s.deal;
-        grid=s.grid;
-        frozen=new Set(deal.fz);
-        lineup=s.lineup;
-        strikes=s.strikes||0;
-        sel=null; hintMsg='Welcome back — your mountain is right where you left it.';
-        render();
-        return true;
-      }catch(e){ return false; }
-    }
-    function restart(){
-      grid=deal.g.slice();
-      frozen=new Set(deal.fz);
-      lineup=deal.cards.slice();
-      sel=null; strikes=0; hintMsg=null;
-      render();
-    }
-    function setLevel(l){
-      if(!LV[l]||l===level) return;
-      level=l;
-      localStorage.setItem('sd_tracks_level',l);
-      newDeal();
-    }
-    function place(cardIdx,landing){
-      hintMsg=null;
-      grid[landing]=lineup[cardIdx];
-      lineup.splice(cardIdx,1);
-      sel=null;
-      if(level==='green'&&lineup.length>0)
-        hintMsg=`Nice! ${lineup.length} card${lineup.length===1?'':'s'} to go — pick up another.`;
-      render();
-      if(lineup.length===0){
-        localStorage.removeItem('sd_ft_save');
-        const w=+(localStorage.getItem('sd_tracks_wins')||0)+1;
-        localStorage.setItem('sd_tracks_wins',w);
-        const titles={green:'Bunny slope cleared! 🐰',blue:'Summit reached! 🏔️',
-                      black:'Black diamond conquered! 🖤',dblack:'DOUBLE BLACK! 🏆 Two sudokus, zero guesses.'};
-        const next={green:['blue','Next: 🟦 blue'],blue:['black','Next: ⬥ black diamond'],
-                    black:['dblack','Next: ⬥⬥ double black']}[level];
-        const btns=[['New deal',newDeal]];
-        if(next) btns.push([next[1],()=>setLevel(next[0])]);
-        overlay(titles[level],'Every card found its place. Fresh powder awaits.',btns);
-        return;
-      }
-    }
-    function strike(cellIdx,msg){
-      strikes++;
-      hintMsg=msg;
-      const el=wrap.querySelector(`[data-idx="${cellIdx}"]`);
-      if(el){el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'),320);}
-      renderTop();
-      saveFT();
-      if(strikes>=3){
-        overlay('Three ✗ — snowed in! ❄️','The mountain wins this run. Same deal or fresh powder?',
-          [['Retry deal',restart],['New deal',newDeal]]);
-      }
-    }
-    function conflictReason(g,i,card){
-      const nn=cfg().n*cfg().n;
-      for(let j=0;j<nn;j++){
-        const o=g[j];
-        if(!o||j===i) continue;
-        const where=row(j)===row(i)?'row':col(j)===col(i)?'column':box(j)===box(i)?'box':null;
-        if(!where) continue;
-        if(o.n===card.n) return `that ${where} already has a ${ROMAN[o.n]}`;
-        if(o.s===card.s) return `that ${where} already has ${SUITS[o.s].sym}`;
-      }
-      return 'that spot breaks a row, column or box';
-    }
-    function placeClassic(cellIdx){
-      if(sel===null||grid[cellIdx]||strikes>=3) return;
-      const card=lineup[sel];
-      if(conflicts(grid,cellIdx,card)){
-        strike(cellIdx,`✗ — ${conflictReason(grid,cellIdx,card)}. The card is still yours — try another spot.`);
-        return;
-      }
-      const g2=grid.slice(); g2[cellIdx]=card;
-      if(!completable(g2,lineup.toSpliced(sel,1))){
-        strike(cellIdx,'✗ — dead end. The mountain couldn’t be finished from there.');
-        return;
-      }
-      place(sel,cellIdx);
-    }
-    /* 💡 coach: find a correct move and glow it (free, for learning).
-       Classic boards first hunt a NO-GUESS cell — a spot where exactly one
-       of your cards fits — and say so, teaching the sudoku foothold. */
-    function hint(){
-      if(!deal||!lineup.length) return;
-      const c=cfg();
-      let pick=null,msg=null;
-      const nn=c.n*c.n;
-      for(let i=0;i<nn&&!pick;i++){
-        if(grid[i]) continue;
-        const fits=lineup.filter(cd=>!conflicts(grid,i,cd));
-        const distinct=new Set(fits.map(cd=>cd.n+','+cd.s));
-        if(fits.length&&distinct.size===1){
-          const ci=lineup.indexOf(fits[0]);
-          pick={ci,cell:i};
-          msg='💡 No guessing: only ONE of your cards fits the glowing cell — its row, column and box rule out everything else.';
-        }
-      }
-      if(!pick){
-        for(let ci=0;ci<lineup.length&&!pick;ci++){
-          const cells=[];
-          for(let i=0;i<nn;i++) if(!grid[i]&&!conflicts(grid,i,lineup[ci])) cells.push(i);
-          if(cells.length===1){
-            pick={ci,cell:cells[0]};
-            msg='💡 No guessing: the glowing card has only ONE cell it can live in — everywhere else is ruled out.';
-          }
-        }
-      }
-      for(let ci=0;ci<lineup.length&&!pick;ci++){
-        const card=lineup[ci];
-        const t=deal.sol.findIndex(s=>s.n===card.n&&s.s===card.s);
-        if(t<0||grid[t]) continue;
-        if(!conflicts(grid,t,card)){
-          const g2=grid.slice(); g2[t]=card;
-          if(completable(g2,lineup.toSpliced(ci,1))) pick={ci,cell:t};
-        }
-      }
-      if(!pick){
-        outer:
-        for(let ci=0;ci<lineup.length;ci++){
-          for(let i=0;i<nn;i++){
-            if(grid[i]||conflicts(grid,i,lineup[ci])) continue;
-            const g2=grid.slice(); g2[i]=lineup[ci];
-            if(completable(g2,lineup.toSpliced(ci,1))){pick={ci,cell:i};break outer;}
-          }
-        }
-      }
-      if(!pick) return;
-      sel=pick.ci;
-      hintMsg=msg||'💡 The glowing card fits the glowing spot.';
-      render();
-      const cellEl=wrap.querySelector(`[data-idx="${pick.cell}"]`);
-      const chipEl=$('ftLineup').children[pick.ci];
-      [cellEl,chipEl].forEach(e=>e&&e.classList.add('hintFlash'));
-      setTimeout(()=>{
-        [cellEl,chipEl].forEach(e=>e&&e.classList.remove('hintFlash'));
-      },2600);
-    }
-    /* rendering */
-    const wrap=$('ftWrap');
-    function renderTop(){
-      const c=cfg();
-      const ids={green:'lvGreen',blue:'lvBlue',black:'lvBlack',dblack:'lvDblack'};
-      for(const l in ids) $(ids[l]).classList.toggle('modeOn',l===level);
-      $('ftStrikes').textContent='✗'.repeat(Math.min(3,strikes))+'·'.repeat(Math.max(0,3-strikes));
-      $('ftWins').textContent='🏔️×'+(localStorage.getItem('sd_tracks_wins')||'0');
-      const card=sel!==null?lineup[sel]:null;
-      const idle={green:'Bunny slope — four cards, four cells, every card fits. Pick one up below.',
-                  blue:'No guessing, ever — a forced move always exists, first tile to last. Start where a row or box is fullest; 💡 finds it.',
-                  black:'Black diamond — 9×9, icons only: all nine sports in every row, column and box. 💡 finds a no-guess move.',
-                  dblack:'DOUBLE black — 9×9, TWO sudokus at once: numerals AND sports. No guessing needed; 💡 proves it.'};
-      const picked={green:'Now tap any green cell — on the bunny slope, every spot works!',
-                    blue:'Tap any open cell — a wrong spot costs an ✗ but you keep the card.',
-                    black:'Tap any open cell — a wrong spot costs an ✗ but you keep the card.',
-                    dblack:'Tap any open cell — a wrong spot costs an ✗ but you keep the card.'};
-      $('ftHint').textContent=hintMsg||(card?picked[level]:idle[level]);
-    }
-    function render(){
-      const c=cfg(), n=c.n, nn=n*n;
-      wrap.innerHTML='';
-      wrap.className='lv'+n+(c.iconsOnly?' iconsOnly':'');
-      let tpl,gpos;
-      if(n===2){ tpl='1fr 1fr'; gpos=v=>v+1; }
-      else if(n===4){ tpl='1fr 1fr 10px 1fr 1fr'; gpos=v=>v+1+(v>=2?1:0); }
-      else{ tpl='1fr 1fr 1fr 6px 1fr 1fr 1fr 6px 1fr 1fr 1fr'; gpos=v=>v+1+Math.floor(v/3); }
-      wrap.style.gridTemplateColumns=tpl;
-      wrap.style.gridTemplateRows=tpl;
-      const card=sel!==null?lineup[sel]:null;
-      const cellLive=new Set();
-      if(level==='green'&&card)
-        for(let i=0;i<nn;i++) if(!grid[i]) cellLive.add(i);
-      for(let i=0;i<nn;i++){
-        const el=document.createElement('div');
-        /* checkerboard box tint makes the 3x3 structure easy to see */
-        const boxB=n===9&&box(i)%2===1;
-        el.className='cell'+(frozen.has(i)?' frozen':'')+(cellLive.has(i)?' legal':'')+(boxB?' boxB':'');
-        el.dataset.idx=i;
-        if(grid[i]) el.innerHTML=cardHTML(grid[i],c.iconsOnly);
-        el.style.gridRow=gpos(row(i)); el.style.gridColumn=gpos(col(i));
-        el.addEventListener('click',()=>placeClassic(i));
-        wrap.appendChild(el);
-      }
-      const lu=$('ftLineup');
-      lu.innerHTML='';
-      lu.className=(n===9?'lv9chips':'')+(c.iconsOnly?' iconsOnly':'');
-      lineup.forEach((cd,idx)=>{
-        const ch=document.createElement('button');
-        ch.className='chip'+(idx===sel?' sel':'');
-        ch.innerHTML=cardHTML(cd,c.iconsOnly);
-        ch.addEventListener('click',()=>{sel=idx===sel?null:idx; hintMsg=null; render();});
-        lu.appendChild(ch);
-      });
-      renderTop();
-      saveFT();
-    }
-    function enter(){ if(!deal && !loadFT()) newDeal(); }
-    $('ftNew').addEventListener('click',newDeal);
-    $('lvGreen').addEventListener('click',()=>setLevel('green'));
-    $('lvBlue').addEventListener('click',()=>setLevel('blue'));
-    $('lvBlack').addEventListener('click',()=>setLevel('black'));
-    $('lvDblack').addEventListener('click',()=>setLevel('dblack'));
-    $('ftHintBtn').addEventListener('click',hint);
-    $('ftRestart').addEventListener('click',restart);
-    return {newDeal,restart,
-      completable,logicSolvable,setLevel,placeClassic,hint,enter,
-      get state(){return {grid,lineup,frozen:frozen?[...frozen]:[],sel,level,strikes};},
-      get deal(){return deal;},
-      place:(ci,L)=>place(ci,L),
-      select:i=>{sel=i;render();}};
-  })();
-
-  /* ================= AVALANCHE — beat the clock ================= */
-  const AV=(()=>{
-    const COLS=5, ROWS=6;
-    let grid,queue,score,level,drops,over,tickIv=null,deadline=0,started=false;
-    const idx=(r,c)=>r*COLS+c;
-    /* gentle for young and old: 8s at level 1, never below 2.5s */
-    const dropInterval=()=>Math.max(2500,8000-(level-1)*500);
-    function spawn(){
-      const roll=Math.random();
-      const v=roll<0.55?0:roll<0.85?1:2;
-      return {v,s:Math.floor(Math.random()*4)};
-    }
-    function newRun(){
-      grid=new Array(COLS*ROWS).fill(null);
-      queue=[spawn(),spawn()];
-      score=0; level=1; drops=0; over=false; started=true;
-      $('avReady').hidden=true;
-      $('avGame').hidden=false;
-      render();
-      startTimer();
-      $('avHint').textContent='Tap a ▼ lane to drop — beat the clock!';
-    }
-    function startTimer(){
-      stopTimer();
-      deadline=Date.now()+dropInterval();
-      tickIv=setInterval(()=>{
-        if(over){stopTimer();return;}
-        const total=dropInterval();
-        const left=deadline-Date.now();
-        const bar=$('avTimerBar');
-        const pct=Math.max(0,left/total*100);
-        bar.style.width=pct+'%';
-        bar.style.background=pct<28?'#ffab4a':'var(--accent)';
-        if(left<=0) autoDrop();
-      },90);
-    }
-    function stopTimer(){ if(tickIv){clearInterval(tickIv); tickIv=null;} }
-    function autoDrop(){
-      const open=[];
-      for(let c=0;c<COLS;c++) if(!grid[idx(0,c)]) open.push(c);
-      if(!open.length) return;
-      $('avHint').textContent='⏱️ Too slow — the mountain chose for you!';
-      drop(open[Math.floor(Math.random()*open.length)],true);
-    }
-    function gravity(){
-      for(let c=0;c<COLS;c++){
-        const stack=[];
-        for(let r=ROWS-1;r>=0;r--) if(grid[idx(r,c)]) stack.push(grid[idx(r,c)]);
-        for(let r=ROWS-1;r>=0;r--) grid[idx(r,c)]=stack[ROWS-1-r]||null;
-      }
-    }
-    function findPair(){
-      for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
-        const t=grid[idx(r,c)];
-        if(!t) continue;
-        if(c+1<COLS){const u=grid[idx(r,c+1)]; if(u&&u.v===t.v) return [idx(r,c),idx(r,c+1)];}
-        if(r+1<ROWS){const u=grid[idx(r+1,c)]; if(u&&u.v===t.v) return [idx(r,c),idx(r+1,c)];}
-      }
-      return null;
-    }
-    function resolve(){
-      const events=[];
-      for(;;){
-        gravity();
-        const pair=findPair();
-        if(!pair) break;
-        const [a,b]=pair;
-        const ta=grid[a], tb=grid[b];
-        const same=ta.s===tb.s;
-        const keep=(a>b)?a:b;
-        const drop2=(keep===a)?b:a;
-        if(ta.v>=9){
-          grid[a]=null; grid[b]=null;
-          const pts=500*level;
-          score+=pts;
-          events.push({cell:keep,label:`💥 +${pts}`});
-        }else{
-          const t=grid[keep];
-          t.v+=1;
-          if(same) t.s=ta.s;
-          grid[drop2]=null;
-          const pts=(t.v+1)*(t.v+1)*5*(same?2:1)*level;
-          score+=pts;
-          events.push({cell:keep,label:`+${pts}${same?' ×2!':''}`});
-        }
-      }
-      return events;
-    }
-    /* floating +points over the board — see the score happen */
-    function popPoints(events){
-      const wrapEl=$('avBoardWrap');
-      events.slice(0,4).forEach((ev,k)=>{
-        const cellEl=boardEl.children[ev.cell];
-        if(!cellEl) return;
-        const s=document.createElement('span');
-        s.className='pts';
-        s.textContent=ev.label;
-        s.style.left=(cellEl.offsetLeft+boardEl.offsetLeft+2)+'px';
-        s.style.top=(cellEl.offsetTop+boardEl.offsetTop-6-k*4)+'px';
-        wrapEl.appendChild(s);
-        setTimeout(()=>s.remove(),1000);
-      });
-    }
-    function saveAV(){
-      try{
-        localStorage.setItem('sd_av_save',JSON.stringify({grid,queue,score,level,drops}));
-      }catch(e){}
-    }
-    function continueRun(){
-      try{
-        const s=JSON.parse(localStorage.getItem('sd_av_save'));
-        if(!s||!s.grid){newRun();return;}
-        grid=s.grid; queue=s.queue; score=s.score; level=s.level; drops=s.drops;
-        over=false; started=true;
-        $('avReady').hidden=true;
-        $('avGame').hidden=false;
-        render();
-        startTimer();
-        $('avHint').textContent='Welcome back — the clock is running!';
-      }catch(e){ newRun(); }
-    }
-    function drop(c,fromClock){
-      if(over||!started) return false;
-      if(grid[idx(0,c)]) return false;
-      let r=0;
-      while(r+1<ROWS&&!grid[idx(r+1,c)]) r++;
-      grid[idx(r,c)]=queue.shift();
-      queue.push(spawn());
-      drops++;
-      const nl=1+Math.floor(drops/15);
-      if(nl>level){
-        level=nl;
-        $('avHint').textContent=`⚡ Level ${level} — the clock is a little faster. Keep the rhythm!`;
-      }else if(!fromClock){
-        $('avHint').textContent='Tap a ▼ lane to drop — beat the clock!';
-      }
-      const events=resolve();
-      deadline=Date.now()+dropInterval();
-      let full=true;
-      for(let cc=0;cc<COLS;cc++) if(!grid[idx(0,cc)]) full=false;
-      render();
-      if(events.length) popPoints(events);
-      if(full){
-        over=true;
-        stopTimer();
-        localStorage.removeItem('sd_av_save');
-        const best=Math.max(score,+(localStorage.getItem('sd_aval_best')||0));
-        localStorage.setItem('sd_aval_best',best);
-        overlay('Buried! 🌨️',`The mountain filled up — level ${level}, score ${score}. Best ${best}. Rock and roll, snow style.`,
-          [['New run',newRun]]);
-      }else{
-        saveAV();
-      }
-      return true;
-    }
-    const boardEl=$('avBoard');
-    function renderArrows(){
-      const ar=$('avArrows');
-      ar.innerHTML='';
-      for(let c=0;c<COLS;c++){
-        const b=document.createElement('button');
-        b.textContent='▼';
-        b.title=`Drop in lane ${c+1}`;
-        b.addEventListener('click',()=>drop(c));
-        ar.appendChild(b);
-      }
-    }
-    function render(){
-      boardEl.innerHTML='';
-      for(let i=0;i<COLS*ROWS;i++){
-        const el=document.createElement('div');
-        el.className='cell'+((i%COLS)%2===1?' laneB':'');
-        if(grid[i]) el.innerHTML=cardHTML(grid[i]);
-        el.addEventListener('click',()=>drop(i%COLS));
-        boardEl.appendChild(el);
-      }
-      $('avScore').textContent=score;
-      $('avBest').textContent=localStorage.getItem('sd_aval_best')||'0';
-      $('avLevel').textContent=level;
-      $('avCur').innerHTML=queue[0]?cardHTML(queue[0]):'';
-      $('avNext').innerHTML=queue[1]?cardHTML(queue[1]):'';
-    }
-    function enter(){
-      if(!started){
-        $('avReady').hidden=false;
-        $('avGame').hidden=true;
-        $('avContinue').hidden=!localStorage.getItem('sd_av_save');
-        return;
-      }
-      if(!over) startTimer();
-    }
-    function leave(){ stopTimer(); }
-    renderArrows();
-    $('avNew').addEventListener('click',newRun);
-    $('avStart').addEventListener('click',newRun);
-    $('avContinue').addEventListener('click',continueRun);
-    return {newRun,drop,resolve,enter,leave,
-      get state(){return {grid,queue,score,level,drops,over,started};},
-      _set(g){grid=g;}};
-  })();
-
-  /* wiring */
-  $('tabTracks').addEventListener('click',()=>show('tracks'));
-  $('tabAval').addEventListener('click',()=>show('aval'));
-  show(localStorage.getItem('sd_tab')==='aval'?'aval':'tracks');
-  /* first visit: open the rules so nobody starts lost */
-  if(!localStorage.getItem('sd_seen')){
-    document.querySelector('#tracks details').open=true;
-    localStorage.setItem('sd_seen','1');
-  }
-  $('resetAll').addEventListener('click',()=>{
-    if(!confirm(`Reset ALL ${GAME.productName} progress on this device — saves, bests and summits?`)) return;
-    ['sd_ft_save','sd_av_save','sd_tracks_wins','sd_aval_best','sd_tracks_level','sd_tab','sd_seen']
-      .forEach(k=>localStorage.removeItem(k));
-    location.reload();
-  });
-  window.tracks=FT;
-  window.aval=AV;
-  window._show=show;
-
-  /* embed support: when iframed (idontcry.com/snowdoku), drop the chrome
-     and report height so the host frame fits perfectly */
-  if(window.parent!==window){
-    document.body.classList.add('embedded');
-    document.body.style.minHeight='0';
-    let last=0;
-    const post=()=>{
-      const h=document.body.scrollHeight;
-      if(h!==last){last=h; window.parent.postMessage({type:'snowdoku-height',h},'*');}
-    };
-    new MutationObserver(post).observe(document.body,{childList:true,subtree:true,attributes:true});
-    window.addEventListener('load',post);
-    post();
-    setTimeout(()=>{last=0;post();},300);
-    setTimeout(()=>{last=0;post();},1200);
-  }
+  const b=document.getElementById('themeBtn');
+  function apply(t){document.body.dataset.theme=t; document.documentElement.dataset.omTheme=t; b.textContent=t==='dark'?'🌙':'☀️';}
+  apply(localStorage.getItem('om-theme')==='light'?'light':'dark');
+  b.addEventListener('click',()=>{const t=document.body.dataset.theme==='dark'?'light':'dark'; localStorage.setItem('om-theme',t); apply(t);});
 })();
 </script>
 </body>
