@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>SnowDoku.com — winter brain games in Roman numerals</title>
-<meta name="description" content="Winter brain games in Roman numerals. Fresh Tracks: sudoku where every tile is two puzzles at once, from bunny slope to double black diamond. Avalanche: beat-the-clock merges that speed up every level.">
-<meta property="og:title" content="SnowDoku — winter brain games">
-<meta property="og:description" content="Sudoku × winter sports. Four slopes from bunny hill to double black diamond, plus Avalanche — a beat-the-clock merge game.">
+<title>SlopeDoku — winter brain games in Roman numerals · an OpenDoku game</title>
+<meta name="description" content="SlopeDoku, the first OpenDoku game: winter brain games in Roman numerals. Fresh Tracks — sudoku where every tile is two puzzles at once, from bunny slope to double black diamond. Avalanche — beat-the-clock merges.">
+<meta property="og:title" content="SlopeDoku — an OpenDoku game">
+<meta property="og:description" content="Sudoku × winter sports. Four slopes from bunny hill to double black diamond, plus Avalanche. First of many OpenDoku puzzle games.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏔️</text></svg>">
 <meta name="theme-color" content="#0b1220">
 <script>
 /* PWA wiring — only on snowdoku.com itself (not the idontcry embed):
    manifest + icons + offline service worker = installable app. */
-if(window.parent===window && new RegExp('(^|\\.)snowdoku\\.com$').test(location.hostname)){
-  /* PWA activates on the production domain only (keep in sync with GAME.domain
+if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hostname)){
+  /* PWA activates on the production domains only (keep in sync with GAME.domain
      on rename — this guard runs before the THEME ZONE exists) */
   const l1=document.createElement('link'); l1.rel='manifest'; l1.href='/manifest.json';
   const l2=document.createElement('link'); l2.rel='apple-touch-icon'; l2.href='/icons/apple-touch-icon.png';
@@ -105,6 +105,7 @@ if(window.parent===window && new RegExp('(^|\\.)snowdoku\\.com$').test(location.
   }
   .hero h1{font-size:2.1rem; margin:0; letter-spacing:.5px;}
   .hero h1 span{color:var(--accent);}
+  .hero .series{margin:6px 0 0; font-size:.72rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); font-family:system-ui,sans-serif;}
   .hero .tag{margin:7px 0 0; font-size:.95rem; font-weight:bold; color:var(--accent);}
   .hero .sub{margin:5px 0 0; font-size:.82rem; color:var(--dim); font-style:italic;}
   .tabs{display:flex; gap:8px; margin:18px 0 14px;}
@@ -277,7 +278,8 @@ if(window.parent===window && new RegExp('(^|\\.)snowdoku\\.com$').test(location.
 
   <div class="hero">
     <div class="brand" aria-hidden="true">🏔️</div>
-    <h1>SnowDoku<span>.com</span></h1>
+    <h1>SlopeDoku</h1>
+    <p class="series" id="heroSeries">An OpenDoku game · Open Mirror LLC</p>
     <p class="tag">Winter brain games in Roman numerals</p>
     <p class="sub">Every tile is two puzzles — the numeral and the sport must both fit.</p>
   </div>
@@ -425,8 +427,9 @@ if(window.parent===window && new RegExp('(^|\\.)snowdoku\\.com$').test(location.
      'snowdoku-height' postMessage type (embed protocol paired with
      idontcry's SnowdokuGame.tsx) — internal, not branding. */
   const GAME={
-    productName:'SnowDoku',
-    domain:'snowdoku.com',
+    productName:'SlopeDoku',
+    series:'OpenDoku',          // the puzzle-games family — one of many to come
+    domain:'opendoku.com',      // series home; snowdoku.com stays aliased
     tagline:'Winter brain games in Roman numerals',
     sub:'Every tile is two puzzles — the numeral and the sport must both fit.',
     brand:'🏔️'
@@ -475,16 +478,18 @@ if(window.parent===window && new RegExp('(^|\\.)snowdoku\\.com$').test(location.
 
   /* ---------- theme-zone injection: ALL naming renders from GAME ---------- */
   const TLD='.'+GAME.domain.split('.').pop();
-  document.title=`${GAME.productName}${TLD} — ${GAME.tagline.toLowerCase()}`;
+  document.title=`${GAME.productName} — ${GAME.tagline.toLowerCase()} · an ${GAME.series} game`;
   document.querySelector('.hero h1').innerHTML=
-    `${GAME.productName}<span>${TLD}</span>`;
+    GAME.productName.replace(/Doku$/,'<span>Doku</span>');
+  document.getElementById('heroSeries').textContent=
+    `An ${GAME.series} game · Open Mirror LLC`;
   document.querySelector('.hero .tag').textContent=GAME.tagline;
   document.querySelector('.hero .sub').textContent=GAME.sub;
   document.querySelector('.brand').textContent=GAME.brand;
   document.querySelector('.om-bar .site').textContent=GAME.domain.toUpperCase();
   document.getElementById('footBrand').innerHTML=
-    `${GAME.productName}<span style="color:var(--accent)">${TLD}</span>`;
-  document.getElementById('footTag').textContent=' · '+GAME.tagline;
+    `${GAME.series}<span style="color:var(--accent)">${TLD}</span>`;
+  document.getElementById('footTag').textContent=` · ${GAME.productName} — ${GAME.tagline.toLowerCase()}`;
 
   /* ---------- tabs ---------- */
   let tab=null;
