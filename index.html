@@ -232,6 +232,11 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
   .ov h2{margin:0 0 8px; font-size:1.4rem;}
   .ov p{color:var(--dim); font-size:.9rem; margin:0 0 18px;}
   .ov .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+  @media (prefers-reduced-motion: reduce){
+    .cell.shake{animation:none;}
+    .pts{animation:none;}
+    #avTimerBar{transition:none;}
+  }
   details{margin-top:14px; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 16px; font-size:.9rem; color:var(--dim);}
   details summary{cursor:pointer; color:var(--ink); font-size:1rem; font-weight:bold; padding:2px 0;}
   details li{margin:9px 0; line-height:1.55;}
@@ -313,6 +318,7 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
         <li>The lineup is exactly the right cards to finish the board, and <b>only one finished mountain exists</b> — so every move can be figured out, sudoku-style, never guessed. Start where a row, column or box already has the most cards: somewhere, a cell will accept exactly one of your cards.</li>
         <li>A move that breaks the rules — or would make the mountain impossible to finish — gets an <b>✗</b>, but the card comes back to you to try somewhere else. Mistakes add up: three ✗ in one run and you&rsquo;re out. Every deal is solvable.</li>
         <li>💡 is your coach — it glows a correct card and spot when you&rsquo;re stuck.</li>
+        <li>Your game saves itself — close the app, come back, keep climbing. <button id="resetAll" style="padding:6px 12px;font-size:.8rem">Reset all progress</button></li>
       </ul>
     </details>
   </div>
@@ -334,6 +340,7 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
         <li>Beat the clock — wait too long and the tile drops itself!</li>
       </ol>
       <button id="avStart">▶ Start the run</button>
+      <button id="avContinue" hidden style="margin-left:8px">↩ Continue last run</button>
     </div>
 
     <div id="avGame" hidden>
@@ -397,6 +404,21 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
 <script>
 (function(){
   'use strict';
+  /* ═════════════════════ THEME ZONE — the doku-engine seed ═════════════════
+     To build the next Open Mirror doku (SuitDoku, DogDoku, BibleDoku,
+     ColorDoku...): fork this file, change ONLY this zone plus /icons and
+     manifest.json. Everything below is theme-agnostic engine: board
+     generators (incl. the 9×9 orthogonal-pair construction), unique-solution
+     math, validators, strikes, the 💡 coach, save/resume, timers, PWA.
+     GAME = identity · SUITS = tile categories (9 for the 9×9 board) ·
+     ROMAN = glyph track (10: 9 board glyphs + the merge-cap glyph). */
+  const GAME={
+    name:'SnowDoku',
+    domain:'snowdoku.com',
+    tagline:'Winter brain games in Roman numerals',
+    sub:'Every tile is two puzzles — the numeral and the sport must both fit.',
+    brand:'🏔️'
+  };
   const SUITS=[
     {id:'ski',  sym:'🎿'},
     {id:'board',sym:'🏂'},
@@ -438,6 +460,15 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
     localStorage.setItem('om-theme',t);
     applyTheme(t);
   });
+
+  /* ---------- theme-zone injection: brand renders from GAME ---------- */
+  document.title=`${GAME.name}.com — ${GAME.tagline.toLowerCase()}`;
+  document.querySelector('.hero h1').innerHTML=
+    `${GAME.name}<span>.${GAME.domain.split('.').pop()}</span>`;
+  document.querySelector('.hero .tag').textContent=GAME.tagline;
+  document.querySelector('.hero .sub').textContent=GAME.sub;
+  document.querySelector('.brand').textContent=GAME.brand;
+  document.querySelector('.om-bar .site').textContent=GAME.domain.toUpperCase();
 
   /* ---------- tabs ---------- */
   let tab=null;
@@ -712,6 +743,29 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
       deal={g:sol.map((cd,i)=>fz.has(i)?cd:null),cards,fz:[...fz],sol};
       restart();
     }
+    /* save/resume: the mountain survives closing the app */
+    function saveFT(){
+      if(!deal) return;
+      try{
+        localStorage.setItem('sd_ft_save',JSON.stringify({level,deal,grid,lineup,strikes}));
+      }catch(e){}
+    }
+    function loadFT(){
+      try{
+        const s=JSON.parse(localStorage.getItem('sd_ft_save'));
+        if(!s||!LV[s.level]||!s.deal||!s.grid||!s.lineup) return false;
+        level=s.level;
+        localStorage.setItem('sd_tracks_level',level);
+        deal=s.deal;
+        grid=s.grid;
+        frozen=new Set(deal.fz);
+        lineup=s.lineup;
+        strikes=s.strikes||0;
+        sel=null; undoStack=[]; hintMsg='Welcome back — your mountain is right where you left it.';
+        render();
+        return true;
+      }catch(e){ return false; }
+    }
     function restart(){
       grid=deal.g.slice();
       frozen=new Set(deal.fz);
@@ -742,6 +796,7 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
         hintMsg=`Nice! ${lineup.length} card${lineup.length===1?'':'s'} to go — pick up another.`;
       render();
       if(lineup.length===0){
+        localStorage.removeItem('sd_ft_save');
         const w=+(localStorage.getItem('sd_tracks_wins')||0)+1;
         localStorage.setItem('sd_tracks_wins',w);
         const titles={green:'Bunny slope cleared! 🐰',blue:'Summit reached! 🏔️',
@@ -766,6 +821,7 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
       const el=wrap.querySelector(`[data-idx="${cellIdx}"]`);
       if(el){el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'),320);}
       renderTop();
+      saveFT();
       if(strikes>=3){
         overlay('Three ✗ — snowed in! ❄️','The mountain wins this run. Same deal or fresh powder?',
           [['Retry deal',restart],['New deal',newDeal]]);
@@ -961,8 +1017,9 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
       $('ftUndo').style.display=c.physics?'':'none';
       $('ftUndo').disabled=undoStack.length===0;
       renderTop();
+      saveFT();
     }
-    function enter(){ if(!deal) newDeal(); }
+    function enter(){ if(!deal && !loadFT()) newDeal(); }
     $('ftNew').addEventListener('click',newDeal);
     $('lvGreen').addEventListener('click',()=>setLevel('green'));
     $('lvBlue').addEventListener('click',()=>setLevel('blue'));
@@ -1082,6 +1139,24 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
         setTimeout(()=>s.remove(),1000);
       });
     }
+    function saveAV(){
+      try{
+        localStorage.setItem('sd_av_save',JSON.stringify({grid,queue,score,level,drops}));
+      }catch(e){}
+    }
+    function continueRun(){
+      try{
+        const s=JSON.parse(localStorage.getItem('sd_av_save'));
+        if(!s||!s.grid){newRun();return;}
+        grid=s.grid; queue=s.queue; score=s.score; level=s.level; drops=s.drops;
+        over=false; started=true;
+        $('avReady').hidden=true;
+        $('avGame').hidden=false;
+        render();
+        startTimer();
+        $('avHint').textContent='Welcome back — the clock is running!';
+      }catch(e){ newRun(); }
+    }
     function drop(c,fromClock){
       if(over||!started) return false;
       if(grid[idx(0,c)]) return false;
@@ -1106,10 +1181,13 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
       if(full){
         over=true;
         stopTimer();
+        localStorage.removeItem('sd_av_save');
         const best=Math.max(score,+(localStorage.getItem('sd_aval_best')||0));
         localStorage.setItem('sd_aval_best',best);
         overlay('Buried! 🌨️',`The mountain filled up — level ${level}, score ${score}. Best ${best}. Rock and roll, snow style.`,
           [['New run',newRun]]);
+      }else{
+        saveAV();
       }
       return true;
     }
@@ -1144,6 +1222,7 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
       if(!started){
         $('avReady').hidden=false;
         $('avGame').hidden=true;
+        $('avContinue').hidden=!localStorage.getItem('sd_av_save');
         return;
       }
       if(!over) startTimer();
@@ -1152,6 +1231,7 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
     renderArrows();
     $('avNew').addEventListener('click',newRun);
     $('avStart').addEventListener('click',newRun);
+    $('avContinue').addEventListener('click',continueRun);
     return {newRun,drop,resolve,enter,leave,
       get state(){return {grid,queue,score,level,drops,over,started};},
       _set(g){grid=g;}};
@@ -1161,6 +1241,17 @@ if(window.parent===window && /(^|\.)snowdoku\.com$/.test(location.hostname)){
   $('tabTracks').addEventListener('click',()=>show('tracks'));
   $('tabAval').addEventListener('click',()=>show('aval'));
   show(localStorage.getItem('sd_tab')==='aval'?'aval':'tracks');
+  /* first visit: open the rules so nobody starts lost */
+  if(!localStorage.getItem('sd_seen')){
+    document.querySelector('#tracks details').open=true;
+    localStorage.setItem('sd_seen','1');
+  }
+  $('resetAll').addEventListener('click',()=>{
+    if(!confirm('Reset ALL SnowDoku progress on this device — saves, bests and summits?')) return;
+    ['sd_ft_save','sd_av_save','sd_tracks_wins','sd_aval_best','sd_tracks_level','sd_tab','sd_seen']
+      .forEach(k=>localStorage.removeItem(k));
+    location.reload();
+  });
   window.tracks=FT;
   window.aval=AV;
   window._show=show;
