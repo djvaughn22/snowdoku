@@ -1,15 +1,28 @@
 {
-  "name": "SnowDoku — winter brain games",
-  "short_name": "SnowDoku",
-  "description": "Winter brain games in Roman numerals. Fresh Tracks sudoku from bunny slope to double black diamond, plus Avalanche.",
+  "name": "SlopeDoku \u2014 winter brain games (an OpenDoku game)",
+  "short_name": "SlopeDoku",
+  "description": "SlopeDoku, the first OpenDoku game: winter brain games in Roman numerals. Sudoku where every tile is two puzzles at once, plus Avalanche.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0b1220",
   "theme_color": "#0b1220",
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
