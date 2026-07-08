@@ -148,17 +148,15 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
   #ftWins{color:var(--dim); font-size:.78rem; font-weight:bold;}
   #ftWrap.lv2 .cell .suit{font-size:2.4rem;}
   #ftWrap.lv2 .cell .num{font-size:1.6rem;}
-  #ftWrap.lv9{gap:2px; padding:6px;}
+  #ftWrap.lv9{gap:2px; padding:5px;}
   #ftWrap.lv9 .cell{border-radius:4px;}
-  #ftWrap.lv9 .cell .suit{font-size:.78rem; line-height:1;}
-  #ftWrap.lv9 .cell .num{font-size:.5rem;}
-  #ftWrap.lv9 .cell .num.long{font-size:.44rem; letter-spacing:-.5px;}
-  .entry{
-    border:none; background:transparent; color:var(--btnbd); font-size:.95rem;
-    padding:0; display:flex; align-items:center; justify-content:center;
-  }
-  .entry.live{background:var(--good); border-radius:6px;}
-  .entry.hid{visibility:hidden;}
+  #ftWrap.lv9 .cell.boxB{filter:brightness(1.28);}
+  #ftWrap.lv9 .cell .suit{font-size:.82rem; line-height:1;}
+  #ftWrap.lv9 .cell .num{font-size:.56rem;}
+  #ftWrap.lv9 .cell .num.long{font-size:.48rem; letter-spacing:-.5px;}
+  #ftWrap.lv9.iconsOnly .cell .suit.solo{font-size:1.5rem;}
+  .cell .suit.solo{font-size:1.9rem;}
+  #ftLineup.iconsOnly .chip .suit.solo{font-size:1.5rem;}
   #ftLineup{
     display:flex; flex-wrap:wrap; gap:6px; background:var(--panel);
     border:1px solid var(--border);
@@ -298,8 +296,8 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
     <div class="bar" style="margin:0 0 10px">
       <button id="lvGreen" title="Green — learn on 4 squares"><span class="shp shpC"></span></button>
       <button id="lvBlue" title="Blue — 4×4"><span class="shp shpS"></span></button>
-      <button id="lvBlack" title="Black diamond — 9×9"><span class="shp shpD"></span></button>
-      <button id="lvDblack" title="Double black — Slopestyle" class="dbl"><span class="shp shpD"></span><span class="shp shpD"></span></button>
+      <button id="lvBlack" title="Black diamond — 9×9, icons only"><span class="shp shpD"></span></button>
+      <button id="lvDblack" title="Double black — 9×9, numerals AND sports" class="dbl"><span class="shp shpD"></span><span class="shp shpD"></span></button>
       <button id="ftHintBtn" title="Coach — show me a move">💡</button>
       <span id="ftWins" style="margin-left:auto"></span>
       <span id="ftStrikes" style="font-size:1.05rem;letter-spacing:4px"></span>
@@ -308,7 +306,6 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
     <div class="hint" id="ftHint">Pick an athlete below.</div>
     <div id="ftLineup"></div>
     <div class="bar">
-      <button id="ftUndo">Undo</button>
       <button id="ftRestart">Restart deal</button>
     </div>
     <details>
@@ -317,8 +314,8 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
         <li>Every tile is two puzzles at once — the <b>numeral</b> and the <b>sport</b> both have to fit. Pick a card below, then tap where it goes.</li>
         <li><span class="shp shpC"></span> <b>Green:</b> the bunny slope — I, II, III and IV in four different suits. Every card fits anywhere; just learn to pick up and place. The rules kick in on blue.</li>
         <li><span class="shp shpS"></span> <b>Blue:</b> 4&times;4 — every row, column and 2&times;2 box needs each numeral <b>I&ndash;IV</b> and each sport once.</li>
-        <li><span class="shp shpD"></span> <b>Black diamond:</b> 9&times;9 — full sudoku with numerals <b>I&ndash;IX</b> AND nine winter sports, both sudoku-valid at once.</li>
-        <li><span class="shp shpD"></span><span class="shp shpD"></span> <b>Double black:</b> Slopestyle — athletes ski to their tiles. 🎿 drop straight down, 🏂 carve diagonally off walls, ⛸️ hockey skates glide in from the side, 🥾 walk anywhere. Colored lanes show where each entry lands. Undo is free — the terrain is the trap.</li>
+        <li><span class="shp shpD"></span> <b>Black diamond:</b> 9&times;9, icons only — every row, column and 3&times;3 box needs <b>all nine winter sports</b>. Big clean tiles, one constraint, real sudoku depth.</li>
+        <li><span class="shp shpD"></span><span class="shp shpD"></span> <b>Double black:</b> the true summit — 9&times;9 where <b>numerals I&ndash;IX AND nine sports</b> are both sudoku-valid at once. Two puzzles in every tile.</li>
         <li>The lineup is exactly the right cards to finish the board, and <b>you never have to guess — guaranteed</b>. From the first tile to the last, there is always a cell that accepts exactly one of your cards, or a card with only one home. Start where a row, column or box is fullest, and if you can&rsquo;t see it, 💡 will.</li>
         <li>A move that breaks the rules — or would make the mountain impossible to finish — gets an <b>✗</b>, but the card comes back to you to try somewhere else. Mistakes add up: three ✗ in one run and you&rsquo;re out. Every deal is solvable.</li>
         <li>💡 is your coach — it glows a correct card and spot when you&rsquo;re stuck.</li>
@@ -454,9 +451,11 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
     }
     return a;
   }
-  /* sport icon reads a little bigger than the numeral */
-  function cardHTML(card){
+  /* sport icon reads a little bigger than the numeral;
+     iconOnly renders just the sport — big and clean (black diamond) */
+  function cardHTML(card,iconOnly){
     const s=SUITS[card.s];
+    if(iconOnly) return `<span class="suit solo">${s.sym}</span>`;
     const n=ROMAN[card.n!==undefined?card.n:card.v];
     return `<span class="suit">${s.sym}</span>`+
            `<span class="num c-${s.id}${n.length>2?' long':''}">${n}</span>`;
@@ -519,18 +518,21 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
 
   /* ================= FRESH TRACKS ================= */
   const FT=(()=>{
-    /* slope ladder: green = 2x2 tutorial, blue = 4x4, black = 9x9,
-       double black = 4x4 with movement physics */
+    /* slope ladder: green 2x2 tutorial · blue 4x4 dual · black 9x9 ICONS
+       ONLY (nine sports, one clean constraint) · double black 9x9 DUAL —
+       numerals AND sports, two sudokus at once. (The old "athletes ski to
+       their tiles" movement mode is retired from SlopeDoku and saved as a
+       future OpenDoku game concept — see README.) */
     const LV={
       green:{n:2},
       blue:{n:4,bw:2,bh:2},
-      black:{n:9,bw:3,bh:3},
-      dblack:{n:4,bw:2,bh:2,physics:true}
+      black:{n:9,bw:3,bh:3,iconsOnly:true},
+      dblack:{n:9,bw:3,bh:3}
     };
     let level=localStorage.getItem('sd_tracks_level');
     if(!LV[level]) level='green';
     const cfg=()=>LV[level];
-    const N=4; // physics board size (double black only)
+    const N=4; // blue board size (genSolution)
     const row=i=>Math.floor(i/cfg().n), col=i=>i%cfg().n;
     function box(i){
       const c=cfg();
@@ -547,48 +549,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
       }
       return false;
     }
-    /* movement physics — landing cell or null (double black only) */
-    function landSki(g,c){
-      if(g[c]) return null;
-      let r=0;
-      while(r+1<N&&!g[(r+1)*N+c]) r++;
-      return r*N+c;
-    }
-    function landBoard(g,c){
-      if(g[c]) return null;
-      let r=0,cc=c,dir=(c===N-1?-1:1);
-      for(;;){
-        const nr=r+1;
-        if(nr>=N) break;
-        let nc=cc+dir;
-        if(nc<0||nc>=N){dir=-dir; nc=cc+dir;}
-        if(!g[nr*N+nc]){r=nr;cc=nc;} else break;
-      }
-      return r*N+cc;
-    }
-    function landSkate(g,r,side){ // side 0=left, 1=right
-      let c=side?N-1:0;
-      const step=side?-1:1;
-      if(g[r*N+c]) return null;
-      while(c+step>=0&&c+step<N&&!g[r*N+c+step]) c+=step;
-      return r*N+c;
-    }
-    function movesFor(g,card){
-      const out=[];
-      if(card.s===0){
-        for(let c=0;c<N;c++){const L=landSki(g,c); if(L!==null&&!conflicts(g,L,card)) out.push({kind:'col',c,landing:L});}
-      }else if(card.s===1){
-        for(let c=0;c<N;c++){const L=landBoard(g,c); if(L!==null&&!conflicts(g,L,card)) out.push({kind:'col',c,landing:L});}
-      }else if(card.s===2){
-        for(let r=0;r<N;r++)for(let side=0;side<2;side++){
-          const L=landSkate(g,r,side); if(L!==null&&!conflicts(g,L,card)) out.push({kind:'side',r,side,landing:L});
-        }
-      }else{
-        for(let i=0;i<16;i++) if(!g[i]&&!conflicts(g,i,card)) out.push({kind:'cell',landing:i});
-      }
-      return out;
-    }
-    /* 4x4 full-solution generator (blue + double black) */
+    /* 4x4 full-solution generator (blue) */
     function genSolution(){
       const cells=new Array(16).fill(null);
       const pairs=[];
@@ -631,35 +592,6 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
       }
       return cells;
     }
-    /* winnability: can each card reach its own target cell in SOME order? */
-    function dealWinnable(g0,items){
-      const n=items.length, full=(1<<n)-1;
-      const memo=new Set();
-      function reach(g,card,T){
-        if(card.s===3) return !g[T];
-        if(card.s===0) return landSki(g,col(T))===T;
-        if(card.s===1){
-          for(let c=0;c<N;c++) if(landBoard(g,c)===T) return true;
-          return false;
-        }
-        return landSkate(g,row(T),0)===T||landSkate(g,row(T),1)===T;
-      }
-      function rec(g,mask){
-        if(mask===full) return true;
-        if(memo.has(mask)) return false;
-        for(let i=0;i<n;i++){
-          if(mask&(1<<i)) continue;
-          if(reach(g,items[i].card,items[i].t)){
-            g[items[i].t]=items[i].card;
-            if(rec(g,mask|(1<<i))) return true;
-            g[items[i].t]=null;
-          }
-        }
-        memo.add(mask);
-        return false;
-      }
-      return rec(g0.slice(),0);
-    }
     /* how many finished mountains exist from here? (capped count) */
     function countSolutions(g,cards,cap){
       let count=0;
@@ -675,7 +607,11 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
           if(!bestOpts||opts.length<bestOpts.length){bestI=i;bestOpts=opts;}
         }
         if(bestI===-1){count++;return;}
+        const tried=new Set();
         for(const c of bestOpts){
+          const k=c.n+','+c.s;
+          if(tried.has(k)) continue;
+          tried.add(k);
           g[bestI]=c;
           rec(g,cards.filter(x=>x!==c));
           g[bestI]=null;
@@ -699,7 +635,8 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
         for(let i=0;i<nn&&!played;i++){
           if(g[i]) continue;
           const fits=cards.filter(c=>!conflicts(g,i,c));
-          if(fits.length===1){g[i]=fits[0]; cards=cards.filter(c=>c!==fits[0]); played=true;}
+          const types=new Set(fits.map(c=>c.n+','+c.s));
+          if(fits.length&&types.size===1){g[i]=fits[0]; cards=cards.filter(c=>c!==fits[0]); played=true;}
         }
         if(!played){
           for(let ci=0;ci<cards.length&&!played;ci++){
@@ -724,7 +661,11 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
         if(!bestOpts||opts.length<bestOpts.length){bestI=i;bestOpts=opts;}
       }
       if(bestI===-1) return true;
+      const tried=new Set();
       for(const c of bestOpts){
+        const k=c.n+','+c.s;
+        if(tried.has(k)) continue;
+        tried.add(k);
         g[bestI]=c;
         if(completable(g,cards.filter(x=>x!==c))){g[bestI]=null;return true;}
         g[bestI]=null;
@@ -732,28 +673,9 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
       return false;
     }
     /* state */
-    let grid,frozen,lineup,sel,undoStack,deal,strikes=0,hintMsg=null;
+    let grid,frozen,lineup,sel,deal,strikes=0,hintMsg=null;
     function newDeal(){
       const c=cfg();
-      if(c.physics){
-        for(let tries=0;tries<200;tries++){
-          const sol=genSolution();
-          const fz=new Set();
-          for(let b=0;b<4;b++){
-            const opts=[];
-            for(let i=0;i<16;i++) if(box(i)===b) opts.push(i);
-            fz.add(opts[Math.floor(Math.random()*opts.length)]);
-          }
-          const g=sol.map((cd,i)=>fz.has(i)?cd:null);
-          const items=shuffle(sol.map((cd,i)=>({card:cd,t:i})).filter(x=>!fz.has(x.t)));
-          if(dealWinnable(g,items)){
-            deal={g:g.slice(),cards:items.map(x=>x.card),fz:[...fz],sol};
-            restart();
-            return;
-          }
-        }
-        throw new Error('deal generation failed');
-      }
       let sol,fz;
       if(level==='green'){
         sol=genGreen();
@@ -766,7 +688,12 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
           for(let i=0;i<16;i++) if(box(i)===b) opts.push(i);
           fz.add(opts[Math.floor(Math.random()*opts.length)]);
         }
+      }else if(level==='black'){
+        /* icons only: one sport sudoku — big, readable, one constraint */
+        sol=genBlack().map(cd=>({n:cd.s,s:cd.s}));
+        fz=new Set(shuffle([...Array(81).keys()]).slice(0,31));
       }else{
+        /* double black: the true summit — numerals AND sports at once */
         sol=genBlack();
         fz=new Set(shuffle([...Array(81).keys()]).slice(0,31));
       }
@@ -802,6 +729,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
       try{
         const s=JSON.parse(localStorage.getItem('sd_ft_save'));
         if(!s||!LV[s.level]||!s.deal||!s.grid||!s.lineup) return false;
+        if(s.grid.length!==LV[s.level].n*LV[s.level].n) return false; // stale save from an older board shape
         level=s.level;
         localStorage.setItem('sd_tracks_level',level);
         deal=s.deal;
@@ -809,7 +737,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
         frozen=new Set(deal.fz);
         lineup=s.lineup;
         strikes=s.strikes||0;
-        sel=null; undoStack=[]; hintMsg='Welcome back — your mountain is right where you left it.';
+        sel=null; hintMsg='Welcome back — your mountain is right where you left it.';
         render();
         return true;
       }catch(e){ return false; }
@@ -818,7 +746,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
       grid=deal.g.slice();
       frozen=new Set(deal.fz);
       lineup=deal.cards.slice();
-      sel=null; undoStack=[]; strikes=0; hintMsg=null;
+      sel=null; strikes=0; hintMsg=null;
       render();
     }
     function setLevel(l){
@@ -827,15 +755,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
       localStorage.setItem('sd_tracks_level',l);
       newDeal();
     }
-    function snapshot(){undoStack.push({g:grid.slice(),l:lineup.slice()});}
-    function undo(){
-      const s=undoStack.pop();
-      if(!s) return;
-      grid=s.g; lineup=s.l; sel=null;
-      render();
-    }
     function place(cardIdx,landing){
-      snapshot();
       hintMsg=null;
       grid[landing]=lineup[cardIdx];
       lineup.splice(cardIdx,1);
@@ -848,19 +768,13 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
         const w=+(localStorage.getItem('sd_tracks_wins')||0)+1;
         localStorage.setItem('sd_tracks_wins',w);
         const titles={green:'Bunny slope cleared! 🐰',blue:'Summit reached! 🏔️',
-                      black:'Black diamond conquered! 🖤',dblack:'Double black! 🏆'};
+                      black:'Black diamond conquered! 🖤',dblack:'DOUBLE BLACK! 🏆 Two sudokus, zero guesses.'};
         const next={green:['blue','Next: 🟦 blue'],blue:['black','Next: ⬥ black diamond'],
-                    black:['dblack','Next: ⬥⬥ Slopestyle']}[level];
+                    black:['dblack','Next: ⬥⬥ double black']}[level];
         const btns=[['New deal',newDeal]];
         if(next) btns.push([next[1],()=>setLevel(next[0])]);
         overlay(titles[level],'Every card found its place. Fresh powder awaits.',btns);
         return;
-      }
-      if(cfg().physics){
-        const anyMove=lineup.some(c=>movesFor(grid,c).length>0);
-        if(!anyMove)
-          overlay('Snowed in! ❄️','No athlete has a legal run from here. Back up or start over — this deal can be won.',
-            [['Undo',undo],['Restart',restart]]);
       }
     }
     function strike(cellIdx,msg){
@@ -908,26 +822,24 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
       if(!deal||!lineup.length) return;
       const c=cfg();
       let pick=null,msg=null;
-      if(!c.physics){
-        const nn=c.n*c.n;
-        for(let i=0;i<nn&&!pick;i++){
-          if(grid[i]) continue;
-          const fits=lineup.filter(cd=>!conflicts(grid,i,cd));
-          const distinct=new Set(fits.map(cd=>cd.n+','+cd.s));
-          if(distinct.size===1){
-            const ci=lineup.indexOf(fits[0]);
-            pick={ci,cell:i};
-            msg='💡 No guessing: only ONE of your cards fits the glowing cell — its row, column and box rule out everything else.';
-          }
+      const nn=c.n*c.n;
+      for(let i=0;i<nn&&!pick;i++){
+        if(grid[i]) continue;
+        const fits=lineup.filter(cd=>!conflicts(grid,i,cd));
+        const distinct=new Set(fits.map(cd=>cd.n+','+cd.s));
+        if(fits.length&&distinct.size===1){
+          const ci=lineup.indexOf(fits[0]);
+          pick={ci,cell:i};
+          msg='💡 No guessing: only ONE of your cards fits the glowing cell — its row, column and box rule out everything else.';
         }
-        if(!pick){
-          for(let ci=0;ci<lineup.length&&!pick;ci++){
-            const cells=[];
-            for(let i=0;i<nn;i++) if(!grid[i]&&!conflicts(grid,i,lineup[ci])) cells.push(i);
-            if(cells.length===1){
-              pick={ci,cell:cells[0]};
-              msg='💡 No guessing: the glowing card has only ONE cell it can live in — everywhere else is ruled out.';
-            }
+      }
+      if(!pick){
+        for(let ci=0;ci<lineup.length&&!pick;ci++){
+          const cells=[];
+          for(let i=0;i<nn;i++) if(!grid[i]&&!conflicts(grid,i,lineup[ci])) cells.push(i);
+          if(cells.length===1){
+            pick={ci,cell:cells[0]};
+            msg='💡 No guessing: the glowing card has only ONE cell it can live in — everywhere else is ruled out.';
           }
         }
       }
@@ -935,21 +847,12 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
         const card=lineup[ci];
         const t=deal.sol.findIndex(s=>s.n===card.n&&s.s===card.s);
         if(t<0||grid[t]) continue;
-        if(c.physics){
-          if(movesFor(grid,card).some(m=>m.landing===t)) pick={ci,cell:t};
-        }else if(!conflicts(grid,t,card)){
+        if(!conflicts(grid,t,card)){
           const g2=grid.slice(); g2[t]=card;
           if(completable(g2,lineup.toSpliced(ci,1))) pick={ci,cell:t};
         }
       }
-      if(!pick&&c.physics){
-        for(let ci=0;ci<lineup.length&&!pick;ci++){
-          const ms=movesFor(grid,lineup[ci]);
-          if(ms.length) pick={ci,cell:ms[0].landing};
-        }
-      }
-      if(!pick&&!c.physics){
-        const nn=c.n*c.n;
+      if(!pick){
         outer:
         for(let ci=0;ci<lineup.length;ci++){
           for(let i=0;i<nn;i++){
@@ -976,104 +879,54 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
       const c=cfg();
       const ids={green:'lvGreen',blue:'lvBlue',black:'lvBlack',dblack:'lvDblack'};
       for(const l in ids) $(ids[l]).classList.toggle('modeOn',l===level);
-      $('ftStrikes').textContent=c.physics?'':'✗'.repeat(Math.min(3,strikes))+'·'.repeat(Math.max(0,3-strikes));
+      $('ftStrikes').textContent='✗'.repeat(Math.min(3,strikes))+'·'.repeat(Math.max(0,3-strikes));
       $('ftWins').textContent='🏔️×'+(localStorage.getItem('sd_tracks_wins')||'0');
       const card=sel!==null?lineup[sel]:null;
-      const slopeHints={0:'Skis drop from the top — tap a lit ▼. Lanes show the landing.',
-                   1:'Snowboard carves diagonally — tap a lit ▼. Lanes show the landing.',
-                   2:'Hockey skates glide in from the side — tap ▶ or ◀. Lanes show the landing.',
-                   3:'Snowshoes walk anywhere — tap a lit cell.'};
       const idle={green:'Bunny slope — four cards, four cells, every card fits. Pick one up below.',
                   blue:'No guessing, ever — a forced move always exists, first tile to last. Start where a row or box is fullest; 💡 finds it.',
-                  black:'Black diamond — 9×9, two sudokus at once. A no-guess move always exists; 💡 finds it.',
-                  dblack:'Double black — pick an athlete; they ski to their tile.'};
+                  black:'Black diamond — 9×9, icons only: all nine sports in every row, column and box. 💡 finds a no-guess move.',
+                  dblack:'DOUBLE black — 9×9, TWO sudokus at once: numerals AND sports. No guessing needed; 💡 proves it.'};
       const picked={green:'Now tap any green cell — on the bunny slope, every spot works!',
                     blue:'Tap any open cell — a wrong spot costs an ✗ but you keep the card.',
-                    black:'Tap any open cell — a wrong spot costs an ✗ but you keep the card.'};
-      $('ftHint').textContent=hintMsg||(card
-        ?(c.physics?slopeHints[card.s]:picked[level])
-        :idle[level]);
+                    black:'Tap any open cell — a wrong spot costs an ✗ but you keep the card.',
+                    dblack:'Tap any open cell — a wrong spot costs an ✗ but you keep the card.'};
+      $('ftHint').textContent=hintMsg||(card?picked[level]:idle[level]);
     }
     function render(){
       const c=cfg(), n=c.n, nn=n*n;
       wrap.innerHTML='';
-      wrap.className='lv'+n;
+      wrap.className='lv'+n+(c.iconsOnly?' iconsOnly':'');
       let tpl,gpos;
-      if(c.physics){ tpl='26px 1fr 1fr 10px 1fr 1fr 26px'; gpos=v=>v+2+(v>=2?1:0); }
-      else if(n===2){ tpl='1fr 1fr'; gpos=v=>v+1; }
+      if(n===2){ tpl='1fr 1fr'; gpos=v=>v+1; }
       else if(n===4){ tpl='1fr 1fr 10px 1fr 1fr'; gpos=v=>v+1+(v>=2?1:0); }
       else{ tpl='1fr 1fr 1fr 6px 1fr 1fr 1fr 6px 1fr 1fr 1fr'; gpos=v=>v+1+Math.floor(v/3); }
       wrap.style.gridTemplateColumns=tpl;
       wrap.style.gridTemplateRows=tpl;
       const card=sel!==null?lineup[sel]:null;
-      const suitColor=card?`var(--${SUITS[card.s].id})`:null;
-      const moves=(c.physics&&card)?movesFor(grid,card):[];
-      const colLive=new Set(moves.filter(m=>m.kind==='col').map(m=>m.c));
-      const sideLive=new Set(moves.filter(m=>m.kind==='side').map(m=>m.r+':'+m.side));
-      const cellLive=new Set(moves.filter(m=>m.kind==='cell').map(m=>m.landing));
+      const cellLive=new Set();
       if(level==='green'&&card)
         for(let i=0;i<nn;i++) if(!grid[i]) cellLive.add(i);
-      const lane=new Set(moves.map(m=>m.landing));
-      const isCol=c.physics&&card&&(card.s===0||card.s===1);
-      const isSide=c.physics&&card&&card.s===2;
-      if(c.physics){
-        for(let cc=0;cc<4;cc++){
-          const b=document.createElement('button');
-          b.className='entry'+(colLive.has(cc)?' live':isCol?'':' hid');
-          b.textContent='▼';
-          if(colLive.has(cc)&&suitColor) b.style.color=suitColor;
-          b.style.gridRow=1; b.style.gridColumn=gpos(cc);
-          b.disabled=!colLive.has(cc);
-          b.addEventListener('click',()=>{
-            const m=moves.find(m=>m.kind==='col'&&m.c===cc);
-            if(m) place(sel,m.landing);
-          });
-          wrap.appendChild(b);
-        }
-        for(let r=0;r<4;r++)for(let side=0;side<2;side++){
-          const b=document.createElement('button');
-          const live=sideLive.has(r+':'+side);
-          b.className='entry'+(live?' live':isSide?'':' hid');
-          b.textContent=side?'◀':'▶';
-          if(live&&suitColor) b.style.color=suitColor;
-          b.style.gridRow=gpos(r); b.style.gridColumn=side?7:1;
-          b.disabled=!live;
-          b.addEventListener('click',()=>{
-            const m=moves.find(m=>m.kind==='side'&&m.r===r&&m.side===side);
-            if(m) place(sel,m.landing);
-          });
-          wrap.appendChild(b);
-        }
-      }
       for(let i=0;i<nn;i++){
         const el=document.createElement('div');
-        el.className='cell'+(frozen.has(i)?' frozen':'')+(cellLive.has(i)?' legal':'');
+        /* checkerboard box tint makes the 3x3 structure easy to see */
+        const boxB=n===9&&box(i)%2===1;
+        el.className='cell'+(frozen.has(i)?' frozen':'')+(cellLive.has(i)?' legal':'')+(boxB?' boxB':'');
         el.dataset.idx=i;
-        if(grid[i]) el.innerHTML=cardHTML(grid[i]);
-        if(lane.has(i)&&suitColor){
-          el.style.boxShadow=`inset 0 0 0 2px ${suitColor}`;
-          // ghost preview: see exactly who lands here before you commit
-          if(!grid[i]) el.innerHTML=`<span style="opacity:.38;display:flex;flex-direction:column;align-items:center">${cardHTML(card)}</span>`;
-        }
+        if(grid[i]) el.innerHTML=cardHTML(grid[i],c.iconsOnly);
         el.style.gridRow=gpos(row(i)); el.style.gridColumn=gpos(col(i));
-        el.addEventListener('click',()=>{
-          if(!c.physics) placeClassic(i);
-          else if(cellLive.has(i)) place(sel,i);
-        });
+        el.addEventListener('click',()=>placeClassic(i));
         wrap.appendChild(el);
       }
       const lu=$('ftLineup');
       lu.innerHTML='';
-      lu.className=n===9?'lv9chips':'';
+      lu.className=(n===9?'lv9chips':'')+(c.iconsOnly?' iconsOnly':'');
       lineup.forEach((cd,idx)=>{
         const ch=document.createElement('button');
         ch.className='chip'+(idx===sel?' sel':'');
-        ch.innerHTML=cardHTML(cd);
+        ch.innerHTML=cardHTML(cd,c.iconsOnly);
         ch.addEventListener('click',()=>{sel=idx===sel?null:idx; hintMsg=null; render();});
         lu.appendChild(ch);
       });
-      $('ftUndo').style.display=c.physics?'':'none';
-      $('ftUndo').disabled=undoStack.length===0;
       renderTop();
       saveFT();
     }
@@ -1084,11 +937,10 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
     $('lvBlack').addEventListener('click',()=>setLevel('black'));
     $('lvDblack').addEventListener('click',()=>setLevel('dblack'));
     $('ftHintBtn').addEventListener('click',hint);
-    $('ftUndo').addEventListener('click',undo);
     $('ftRestart').addEventListener('click',restart);
-    return {newDeal,undo,restart,movesFor,landSki,landBoard,landSkate,
-      completable,setLevel,placeClassic,hint,enter,
-      get state(){return {grid,lineup,frozen:frozen?[...frozen]:[],sel,undoDepth:undoStack?undoStack.length:0,level,strikes};},
+    return {newDeal,restart,
+      completable,logicSolvable,setLevel,placeClassic,hint,enter,
+      get state(){return {grid,lineup,frozen:frozen?[...frozen]:[],sel,level,strikes};},
       get deal(){return deal;},
       place:(ci,L)=>place(ci,L),
       select:i=>{sel=i;render();}};
