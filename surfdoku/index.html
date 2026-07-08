@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>SurfDoku — beach brain games in Roman numerals · an OpenDoku game</title>
-<meta name="description" content="SurfDoku, the first OpenDoku game: beach brain games in Roman numerals. Low Tide — sudoku where every tile is two puzzles at once, from kiddie pool to double red flag. Riptide — beat-the-clock merges.">
+<meta name="description" content="SurfDoku, the first OpenDoku game: beach brain games in Roman numerals. Low Tide — sudoku that climbs to two puzzles in every tile, from kiddie pool to double red flag. Riptide — beat-the-clock merges.">
 <meta property="og:title" content="SurfDoku — an OpenDoku game">
-<meta property="og:description" content="Sudoku × beach games. Four tides from kiddie pool to double red flag, plus Riptide. First of many OpenDoku puzzle games.">
+<meta property="og:description" content="Sudoku × beach games, easy to expert. Four tides from kiddie pool to double red flag, plus Riptide. First of many OpenDoku puzzle games.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌞</text></svg>">
 <meta name="theme-color" content="#0b1220">
 <script>
@@ -224,6 +224,12 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   details{margin-top:14px; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px 16px; font-size:.9rem; color:var(--dim);}
   details summary{cursor:pointer; color:var(--ink); font-size:1rem; font-weight:bold; padding:2px 0;}
   details li{margin:9px 0; line-height:1.55;}
+  .hero{padding:12px 0 0;}
+  .brand{width:52px; height:52px; font-size:1.6rem; border-radius:16px; margin:0 auto 8px;}
+  .hero h1{font-size:1.7rem;}
+  #infoBtn{border-radius:50%; width:36px; height:36px; padding:0; font-size:1rem; font-family:system-ui,sans-serif;}
+  #infoPanel{position:fixed; inset:0; background:rgba(8,14,24,.82); display:flex; align-items:center; justify-content:center; z-index:20; padding:14px;}
+  #infoPanel[hidden]{display:none;}
 </style>
 </head>
 <body data-theme="dark">
@@ -233,6 +239,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
     <a href="https://openmirrorllc.com" target="_blank" rel="noopener noreferrer">Open Mirror LLC</a>
     <span class="right">
       <span class="site">SNOWDOKU.COM</span>
+      <button id="infoBtn" title="About &amp; how to play">ⓘ</button>
       <button id="themeBtn" title="Light / dark">🌙</button>
     </span>
   </div>
@@ -243,9 +250,6 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   <div class="hero">
     <div class="brand" aria-hidden="true">🌞</div>
     <h1>SurfDoku</h1>
-    <p class="series" id="heroSeries">An OpenDoku game · Open Mirror LLC</p>
-    <p class="tag">Beach brain games in Roman numerals</p>
-    <p class="sub">Every tile is two puzzles — the numeral and the sport must both fit.</p>
   </div>
 
   <div class="tabs">
@@ -255,10 +259,6 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
 
   <!-- ============ FRESH TRACKS ============ -->
   <div id="tracks" class="screen">
-    <header class="game">
-      <h2>Low Tide</h2>
-      <button id="ftNew">New deal</button>
-    </header>
     <div class="bar" style="margin:0 0 10px">
       <button id="lvGreen" title="Green flag — kiddie pool, learn on 4 squares"><span class="flg flgG"></span></button>
       <button id="lvBlue" title="Yellow flag — 4×4"><span class="flg flgY"></span></button>
@@ -272,31 +272,13 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
     <div class="hint" id="ftHint">Pick an athlete below.</div>
     <div id="ftLineup"></div>
     <div class="bar">
+      <button id="ftNew">New deal</button>
       <button id="ftRestart">Restart deal</button>
     </div>
-    <details>
-      <summary>How to play</summary>
-      <ul>
-        <li>Every tile is two puzzles at once — the <b>numeral</b> and the <b>sport</b> both have to fit. Pick a card below, then tap where it goes.</li>
-        <li><span class="flg flgG"></span> <b>Green flag:</b> the kiddie pool — I, II, III and IV in four different suits. Every card fits anywhere; just learn to pick up and place. The rules kick in on yellow.</li>
-        <li><span class="flg flgY"></span> <b>Yellow flag:</b> 4&times;4 — every row, column and 2&times;2 box needs each numeral <b>I&ndash;IV</b> and each sport once.</li>
-        <li><span class="flg flgR"></span> <b>Red flag:</b> 9&times;9, icons only — every row, column and 3&times;3 box needs <b>all nine beach games</b>. Big clean tiles, one constraint, real sudoku depth.</li>
-        <li><span class="flg flgR"></span><span class="flg flgR"></span> <b>Double red flag:</b> the true summit — 9&times;9 where <b>numerals I&ndash;IX AND nine sports</b> are both sudoku-valid at once. Two puzzles in every tile.</li>
-        <li>The lineup is exactly the right cards to finish the board, and <b>you never have to guess — guaranteed</b>. From the first tile to the last, there is always a cell that accepts exactly one of your cards, or a card with only one home. Start where a row, column or box is fullest, and if you can&rsquo;t see it, 💡 will.</li>
-        <li>A move that breaks the rules — or would make the beach impossible to finish — gets an <b>✗</b>, but the card comes back to you to try somewhere else. Mistakes add up: three ✗ in one run and you&rsquo;re out. Every deal is solvable.</li>
-        <li>💡 is your coach — it glows a correct card and spot when you&rsquo;re stuck.</li>
-        <li>Your game saves itself — close the app, come back, keep climbing. <button id="resetAll" style="padding:6px 12px;font-size:.8rem">Reset all progress</button></li>
-      </ul>
-    </details>
   </div>
 
   <!-- ============ AVALANCHE ============ -->
   <div id="aval" class="screen">
-    <header class="game">
-      <h2>Riptide</h2>
-      <button id="avNew">New run</button>
-    </header>
-    <p class="objective">🎯 <b>The goal:</b> keep the beach from filling up. Matching numerals wash together — merge, score, survive.</p>
 
     <div id="avReady">
       <h3>🌊 Ready to ride?</h3>
@@ -315,6 +297,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
         <span>Score <b id="avScore">0</b></span>
         <span>Best <b id="avBest">0</b></span>
         <span>Level <b id="avLevel">1</b></span>
+        <button id="avNew" style="padding:6px 12px;font-size:.8rem">New run</button>
       </div>
       <div class="avNow">
         <div class="chip cur" id="avCur"></div>
@@ -333,19 +316,37 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
       </div>
       <div class="hint" id="avHint">Tap a ▼ lane to drop.</div>
     </div>
+  </div>
 
-    <details>
-      <summary>How to play</summary>
-      <ul>
+
+  <div id="infoPanel" hidden>
+    <div class="ov" style="max-width:390px;width:100%;text-align:left;max-height:84vh;overflow-y:auto">
+      <h2 style="margin:0 0 2px">SurfDoku</h2>
+      <p style="margin:0 0 2px;font-size:.72rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-family:system-ui,sans-serif">An OpenDoku game · Open Mirror LLC</p>
+      <p style="margin:8px 0 0;color:var(--dim);font-size:.9rem;line-height:1.55">The climb: green teaches the moves, yellow flag plays numeral AND sport at once, the red flag is a pure icon sudoku, and the double red flag is the summit — two full sudokus in every tile.</p>
+      <h3 style="margin:18px 0 6px;font-size:1rem">How to play — Low Tide</h3>
+      <ul style="margin:0;padding-left:20px;color:var(--dim);font-size:.88rem">
+        <li>Every tile is two puzzles at once — the <b>numeral</b> and the <b>sport</b> both have to fit. Pick a card below, then tap where it goes.</li>
+        <li><span class="flg flgG"></span> <b>Green flag:</b> the kiddie pool — I, II, III and IV in four different suits. Every card fits anywhere; just learn to pick up and place. The rules kick in on yellow.</li>
+        <li><span class="flg flgY"></span> <b>Yellow flag:</b> 4&times;4 — every row, column and 2&times;2 box needs each numeral <b>I&ndash;IV</b> and each sport once.</li>
+        <li><span class="flg flgR"></span> <b>Red flag:</b> 9&times;9, icons only — every row, column and 3&times;3 box needs <b>all nine beach games</b>. Big clean tiles, one constraint, real sudoku depth.</li>
+        <li><span class="flg flgR"></span><span class="flg flgR"></span> <b>Double red flag:</b> the true summit — 9&times;9 where <b>numerals I&ndash;IX AND nine sports</b> are both sudoku-valid at once. Two puzzles in every tile.</li>
+        <li>The lineup is exactly the right cards to finish the board, and <b>you never have to guess — guaranteed</b>. From the first tile to the last, there is always a cell that accepts exactly one of your cards, or a card with only one home. Start where a row, column or box is fullest, and if you can&rsquo;t see it, 💡 will.</li>
+        <li>A move that breaks the rules — or would make the beach impossible to finish — gets an <b>✗</b>, but the card comes back to you to try somewhere else. Mistakes add up: three ✗ in one run and you&rsquo;re out. Every deal is solvable.</li>
+        <li>💡 is your coach — it glows a correct card and spot when you&rsquo;re stuck.</li>
+        <li>Your game saves itself — close the app, come back, keep climbing. <button id="resetAll" style="padding:6px 12px;font-size:.8rem">Reset all progress</button></li>
+      </ul>
+      <h3 style="margin:18px 0 6px;font-size:1rem">How to play — Riptide</h3>
+      <ul style="margin:0;padding-left:20px;color:var(--dim);font-size:.88rem">
         <li><b>The goal is survival:</b> the run ends when the beach fills to the top. Merging keeps it clear — and scores.</li>
         <li>Tap a <b>▼ lane</b> (or anywhere in a column) to drop the tile there <b>before the clock drops it for you</b> somewhere random.</li>
         <li>Touching tiles with equal numerals merge upward: I+I&rarr;II &hellip; IX+IX&rarr;X. Two X&rsquo;s vanish in a 💥 for a big bonus.</li>
         <li>Same-sport merges score <b>double</b>, and every point is multiplied by your level.</li>
         <li>Every 15 drops = next level — the clock gets a little faster. Keep the rhythm.</li>
       </ul>
-    </details>
+      <div style="text-align:center;margin-top:16px"><button id="infoClose">Close</button></div>
+    </div>
   </div>
-
   <div id="overlay" hidden>
     <div class="ov">
       <h2 id="ovTitle"></h2>
@@ -392,9 +393,9 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   const GAME={
     productName:'SurfDoku',
     series:'OpenDoku',          // the puzzle-games family — one of many to come
-    domain:'surfdoku.com',      // buy when ready — one command to attach
+    domain:'opendoku.com',      // one home for the whole series
     tagline:'Beach brain games in Roman numerals',
-    sub:'Every tile is two puzzles — the numeral and the sport must both fit.',
+    sub:'From one easy rule to two puzzles in every tile.',
     brand:'🌞'
   };
   const SUITS=[
@@ -435,6 +436,9 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
     themeBtn.textContent=t==='dark'?'🌙':'☀️';
   }
   applyTheme(localStorage.getItem('om-theme')==='light'?'light':'dark');
+  $('infoBtn').addEventListener('click',()=>{$('infoPanel').hidden=false;});
+  $('infoClose').addEventListener('click',()=>{$('infoPanel').hidden=true;});
+  $('infoPanel').addEventListener('click',(e)=>{if(e.target.id==='infoPanel')$('infoPanel').hidden=true;});
   themeBtn.addEventListener('click',()=>{
     const t=document.body.dataset.theme==='dark'?'light':'dark';
     localStorage.setItem('om-theme',t);
@@ -446,10 +450,6 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   document.title=`${GAME.productName} — ${GAME.tagline.toLowerCase()} · an ${GAME.series} game`;
   document.querySelector('.hero h1').innerHTML=
     GAME.productName.replace(/Doku$/,'<span>Doku</span>');
-  document.getElementById('heroSeries').textContent=
-    `An ${GAME.series} game · Open Mirror LLC`;
-  document.querySelector('.hero .tag').textContent=GAME.tagline;
-  document.querySelector('.hero .sub').textContent=GAME.sub;
   document.querySelector('.brand').textContent=GAME.brand;
   document.querySelector('.om-bar .site').textContent=GAME.domain.toUpperCase();
   document.getElementById('footBrand').innerHTML=
@@ -1119,7 +1119,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   show(localStorage.getItem('su_tab')==='aval'?'aval':'tracks');
   /* first visit: open the rules so nobody starts lost */
   if(!localStorage.getItem('su_seen')){
-    document.querySelector('#tracks details').open=true;
+    $('infoPanel').hidden=false;
     localStorage.setItem('su_seen','1');
   }
   $('resetAll').addEventListener('click',()=>{
