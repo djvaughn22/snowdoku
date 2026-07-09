@@ -137,6 +137,13 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
   #ftWrap.lv9 .cell .num{font-size:.56rem;}
   #ftWrap.lv9 .cell .num.long{font-size:.48rem; letter-spacing:-.5px;}
   #ftWrap.lv9.iconsOnly .cell .suit.solo{font-size:1.5rem;}
+  /* double-diamond dual tiles: icon and numeral on diagonal halves */
+  #ftWrap.lv9:not(.iconsOnly){padding:4px;}
+  #ftWrap.lv9:not(.iconsOnly) .cell{position:relative; background-image:linear-gradient(135deg,transparent 48.5%,var(--cellbd) 48.5%,var(--cellbd) 51.5%,transparent 51.5%);}
+  #ftWrap.lv9:not(.iconsOnly) .cell .suit{position:absolute; top:2%; left:6%; font-size:1.02rem;}
+  #ftWrap.lv9:not(.iconsOnly) .cell .num{position:absolute; bottom:6%; right:7%; font-size:.68rem;}
+  #ftWrap.lv9:not(.iconsOnly) .cell .num.long{font-size:.56rem; letter-spacing:-.5px;}
+  @media (max-width:430px){#ftWrap.lv9:not(.iconsOnly){margin-left:-9px; margin-right:-9px;}}
   .cell .suit.solo{font-size:1.9rem;}
   #ftLineup.iconsOnly .chip .suit.solo{font-size:1.5rem;}
   #ftLineup{
@@ -156,6 +163,9 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
   #ftLineup.lv9chips .chip{width:34px; height:42px;}
   #ftLineup.lv9chips .chip .suit{font-size:.85rem;}
   #ftLineup.lv9chips .chip .num{font-size:.6rem;}
+  #ftLineup.lv9chips:not(.iconsOnly) .chip{width:40px; height:46px; position:relative; background-image:linear-gradient(135deg,transparent 48.5%,var(--cellbd) 48.5%,var(--cellbd) 51.5%,transparent 51.5%);}
+  #ftLineup.lv9chips:not(.iconsOnly) .chip .suit{position:absolute; top:4%; left:8%; font-size:1.05rem;}
+  #ftLineup.lv9chips:not(.iconsOnly) .chip .num{position:absolute; bottom:8%; right:10%; font-size:.68rem;}
   .hintFlash{outline:3px solid #ffd76a; outline-offset:-2px;}
   .bar{display:flex; gap:8px; margin-top:12px; align-items:center;}
   .hint{font-size:.88rem; color:var(--dim); margin-top:10px; min-height:1.25em;}
@@ -263,7 +273,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
       <button id="lvBlue" title="Blue — 4×4"><span class="shp shpS"></span></button>
       <button id="lvBlack" title="Black diamond — 9×9, icons only"><span class="shp shpD"></span></button>
       <button id="lvDblack" title="Double black — 9×9, numerals AND sports" class="dbl"><span class="shp shpD"></span><span class="shp shpD"></span></button>
-      <button id="ftHintBtn" title="Coach — show me a move">💡</button>
+      <button id="ftHintBtn" title="Coach — show me a move (costs one ✗)">💡</button>
       <span id="ftWins" style="margin-left:auto"></span>
       <span id="ftStrikes" style="font-size:1.05rem;letter-spacing:4px"></span>
     </div>
@@ -332,7 +342,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
         <li><span class="shp shpD"></span><span class="shp shpD"></span> <b>Double black:</b> the true summit — 9&times;9 where <b>numerals I&ndash;IX AND nine sports</b> are both sudoku-valid at once. Two puzzles in every tile.</li>
         <li>The lineup is exactly the right cards to finish the board, and <b>you never have to guess — guaranteed</b>. From the first tile to the last, there is always a cell that accepts exactly one of your cards, or a card with only one home. Start where a row, column or box is fullest, and if you can&rsquo;t see it, 💡 will.</li>
         <li>A move that breaks the rules — or would make the mountain impossible to finish — gets an <b>✗</b>, but the card comes back to you to try somewhere else. Mistakes add up: three ✗ in one run and you&rsquo;re out. Every deal is solvable.</li>
-        <li>💡 is your coach — it glows a correct card and spot when you&rsquo;re stuck.</li>
+        <li>💡 is your coach — it glows a correct card and spot when you&rsquo;re stuck — and costs one ✗.</li>
         <li>Your game saves itself — close the app, come back, keep climbing. <button id="resetAll" style="padding:6px 12px;font-size:.8rem">Reset all progress</button></li>
       </ul>
       <h3 style="margin:18px 0 6px;font-size:1rem">How to play — Avalanche</h3>
@@ -780,11 +790,11 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
       }
       place(sel,cellIdx);
     }
-    /* 💡 coach: find a correct move and glow it (free, for learning).
+    /* 💡 coach: find a correct move and glow it (costs one ✗).
        Classic boards first hunt a NO-GUESS cell — a spot where exactly one
        of your cards fits — and say so, teaching the sudoku foothold. */
     function hint(){
-      if(!deal||!lineup.length) return;
+      if(!deal||!lineup.length||strikes>=3) return;
       const c=cfg();
       let pick=null,msg=null;
       const nn=c.n*c.n;
@@ -828,8 +838,13 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
         }
       }
       if(!pick) return;
+      strikes++; renderTop(); saveFT();
+      if(strikes>=3){
+        overlay('Three \u2717 \u2014 snowed in! \u2744\ufe0f','The mountain wins this run. Same deal or fresh powder?',[['Retry deal',restart],['New deal',newDeal]]);
+        return;
+      }
       sel=pick.ci;
-      hintMsg=msg||'💡 The glowing card fits the glowing spot.';
+      hintMsg=(msg||'💡 The glowing card fits the glowing spot.')+' That 💡 cost one ✗.';
       render();
       const cellEl=wrap.querySelector(`[data-idx="${pick.cell}"]`);
       const chipEl=$('ftLineup').children[pick.ci];
