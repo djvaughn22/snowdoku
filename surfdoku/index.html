@@ -189,6 +189,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   #avBoard .cell .suit{font-size:1.15rem;}
   #avBoard .cell .num{font-size:.78rem;}
   #avBoard .cell .num.long{font-size:.64rem;}
+  #avBoard .cell.danger{border-color:#ef4444; box-shadow:inset 0 0 0 1px #ef4444;}
   .pts{
     position:absolute; z-index:5; pointer-events:none;
     font-family:system-ui,sans-serif; font-weight:900; font-size:.95rem; color:var(--ok);
@@ -238,7 +239,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   .hero{padding:12px 0 0;}
   .brand{width:52px; height:52px; font-size:1.6rem; border-radius:16px; margin:0 auto 8px;}
   .hero h1{font-size:1.7rem;}
-  #infoBtn{border-radius:50%; width:36px; height:36px; padding:0; font-size:1rem; font-family:system-ui,sans-serif;}
+  #infoBtn,#sndBtn{border-radius:50%; width:36px; height:36px; padding:0; font-size:1rem; font-family:system-ui,sans-serif;}
   #infoPanel{position:fixed; inset:0; background:rgba(8,14,24,.82); display:flex; align-items:center; justify-content:center; z-index:20; padding:14px;}
   #infoPanel[hidden]{display:none;}
 </style>
@@ -250,6 +251,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
     <a href="https://openmirrorllc.com" target="_blank" rel="noopener noreferrer">Open Mirror LLC</a>
     <span class="right">
       <span class="site">SNOWDOKU.COM</span>
+      <button id="sndBtn" title="Sound on / off">🔊</button>
       <button id="infoBtn" title="About &amp; how to play">ⓘ</button>
       <button id="themeBtn" title="Light / dark">🌙</button>
     </span>
@@ -292,14 +294,14 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   <div id="aval" class="screen">
 
     <div id="avReady">
-      <h3>🌊 Ready to ride?</h3>
-      <p>Tiles fall onto the beach, one at a time.</p>
+      <h3>🌊 Riptide — survive the tide</h3>
+      <p><b>The run ends when the beach fills to the top.</b> Merge tiles to keep space open — the longer you last, the higher the score.</p>
       <ol>
-        <li>Tap a <b>▼ lane</b> to drop the tile where you want it.</li>
-        <li>Touching tiles with the <b>same numeral merge</b> into a bigger one.</li>
-        <li>Beat the clock — wait too long and the tile drops itself!</li>
+        <li>Tap a <b>▼ lane</b> to drop the falling tile — <b>beat the clock</b>, or it drops in a random lane.</li>
+        <li>Touching tiles with the <b>same numeral merge</b> into one bigger tile: I+I→II … IX+IX→X. Two X&rsquo;s = 💥.</li>
+        <li>The clock speeds up <b>every 12 drops</b>. Think fast.</li>
       </ol>
-      <p class="avGoal">🌊 <b>How to win:</b> keep merging so the beach never fills to the top — last as long as you can.</p>
+      <p class="avGoal">🏆 <b>Points:</b> bigger merges pay more · same sport = <b>×2</b> · extra merges from one drop chain <b>⚡×2, ×3…</b> · everything × your level.</p>
       <button id="avStart">▶ Start the run</button>
       <button id="avContinue" hidden style="margin-left:8px">↩ Continue last run</button>
     </div>
@@ -309,6 +311,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
         <span>Score <b id="avScore">0</b></span>
         <span>Best <b id="avBest">0</b></span>
         <span>Level <b id="avLevel">1</b></span>
+        <span title="Drops until the next level">⚡<b id="avToLv">12</b></span>
         <button id="avNew" style="padding:6px 12px;font-size:.8rem">New run</button>
       </div>
       <div class="avNow">
@@ -351,10 +354,10 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
       <h3 style="margin:18px 0 6px;font-size:1rem">How to play — Riptide</h3>
       <ul style="margin:0;padding-left:20px;color:var(--dim);font-size:.88rem">
         <li><b>The goal is survival:</b> the run ends when the beach fills to the top. Merging keeps it clear — and scores.</li>
-        <li>Tap a <b>▼ lane</b> (or anywhere in a column) to drop the tile there <b>before the clock drops it for you</b> somewhere random.</li>
-        <li>Touching tiles with equal numerals merge upward: I+I&rarr;II &hellip; IX+IX&rarr;X. Two X&rsquo;s vanish in a 💥 for a big bonus.</li>
-        <li>Same-sport merges score <b>double</b>, and every point is multiplied by your level.</li>
-        <li>Every 15 drops = next level — the clock gets a little faster. Keep the rhythm.</li>
+        <li>Tap a <b>▼ lane</b> (or anywhere in a column) to drop the tile there <b>before the clock drops it for you</b> in a random lane.</li>
+        <li>Touching tiles with equal numerals merge upward: I+I&rarr;II &hellip; IX+IX&rarr;X. Two X&rsquo;s vanish in a 💥 worth 500 &times; level.</li>
+        <li><b>Scoring:</b> bigger merges are worth more. Same-sport merges pay <b>double</b>. Every extra merge set off by one drop is a <b>⚡ chain</b> — the 2nd merge pays &times;2, the 3rd &times;3. Everything is multiplied by your level.</li>
+        <li><b>Every 12 drops = next level</b> — the clock gets faster (6&nbsp;seconds at the start, down to 1.8), and from level 4 rare IV tiles fall. A red lane is one tile from the top — clear it first.</li>
       </ul>
       <div style="text-align:center;margin-top:16px"><button id="infoClose">Close</button></div>
     </div>
@@ -430,6 +433,34 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
     }
     return a;
   }
+  /* ---------- juice: tiny synth SFX + haptics — no audio files ---------- */
+  const buzz=p=>{try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}};
+  const SFX=(()=>{
+    let ctx=null, on=localStorage.getItem('su_snd')!=='off';
+    function blip(freq,dur,type,gain){
+      if(!on) return;
+      try{
+        ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.type=type; o.frequency.value=freq;
+        g.gain.setValueAtTime(gain,ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+dur);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime+dur);
+      }catch(e){}
+    }
+    return {
+      drop:()=>blip(220,.07,'triangle',.05),
+      merge:n=>blip(300+Math.min(n,6)*80,.16,'sine',.14),
+      boom:()=>{blip(70,.45,'sawtooth',.2); blip(140,.3,'square',.07);},
+      lvl:()=>{blip(523,.1,'sine',.1); setTimeout(()=>blip(784,.16,'sine',.1),90);},
+      win:()=>[523,659,784].forEach((f,i)=>setTimeout(()=>blip(f,.22,'sine',.13),i*110)),
+      over:()=>{blip(196,.28,'sine',.13); setTimeout(()=>blip(131,.5,'sine',.13),200);},
+      strike:()=>blip(110,.18,'square',.1),
+      get on(){return on;},
+      toggle(){on=!on; localStorage.setItem('su_snd',on?'on':'off'); return on;}
+    };
+  })();
   /* sport icon reads a little bigger than the numeral;
      iconOnly renders just the sport — big and clean (black diamond) */
   function cardHTML(card,iconOnly){
@@ -451,6 +482,9 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   $('infoBtn').addEventListener('click',()=>{$('infoPanel').hidden=false;});
   $('infoClose').addEventListener('click',()=>{$('infoPanel').hidden=true;});
   $('infoPanel').addEventListener('click',(e)=>{if(e.target.id==='infoPanel')$('infoPanel').hidden=true;});
+  const sndBtn=$('sndBtn');
+  sndBtn.textContent=SFX.on?'🔊':'🔇';
+  sndBtn.addEventListener('click',()=>{sndBtn.textContent=SFX.toggle()?'🔊':'🔇';});
   themeBtn.addEventListener('click',()=>{
     const t=document.body.dataset.theme==='dark'?'light':'dark';
     localStorage.setItem('om-theme',t);
@@ -742,6 +776,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
         hintMsg=`Nice! ${lineup.length} card${lineup.length===1?'':'s'} to go — pick up another.`;
       render();
       if(lineup.length===0){
+        SFX.win(); buzz([30,30,30]);
         localStorage.removeItem('su_ft_save');
         const w=+(localStorage.getItem('su_tracks_wins')||0)+1;
         localStorage.setItem('su_tracks_wins',w);
@@ -757,6 +792,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
     }
     function strike(cellIdx,msg){
       strikes++;
+      SFX.strike(); buzz(40);
       hintMsg=msg;
       const el=wrap.querySelector(`[data-idx="${cellIdx}"]`);
       if(el){el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'),320);}
@@ -932,19 +968,21 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   /* ================= AVALANCHE — beat the clock ================= */
   const AV=(()=>{
     const COLS=5, ROWS=6;
-    let grid,queue,score,level,drops,over,tickIv=null,deadline=0,started=false;
+    let grid,queue,score,level,drops,over,bestChain=0,tickIv=null,deadline=0,started=false;
     const idx=(r,c)=>r*COLS+c;
-    /* gentle for young and old: 8s at level 1, never below 2.5s */
-    const dropInterval=()=>Math.max(2500,8000-(level-1)*500);
+    /* a thinking-speed game: 6s at level 1, ~0.45s faster per level, floor 1.8s */
+    const dropInterval=()=>Math.max(1800,6000-(level-1)*450);
     function spawn(){
       const roll=Math.random();
-      const v=roll<0.55?0:roll<0.85?1:2;
+      let v=roll<0.55?0:roll<0.85?1:2;
+      /* from level 4, rare IV tiles fall — they take real planning to clear */
+      if(level>=4&&Math.random()<0.12) v=3;
       return {v,s:Math.floor(Math.random()*4)};
     }
     function newRun(){
       grid=new Array(COLS*ROWS).fill(null);
       queue=[spawn(),spawn()];
-      score=0; level=1; drops=0; over=false; started=true;
+      score=0; level=1; drops=0; bestChain=0; over=false; started=true;
       $('avReady').hidden=true;
       $('avGame').hidden=false;
       render();
@@ -961,7 +999,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
         const bar=$('avTimerBar');
         const pct=Math.max(0,left/total*100);
         bar.style.width=pct+'%';
-        bar.style.background=pct<28?'#ffab4a':'var(--accent)';
+        bar.style.background=pct<15?'#ef4444':pct<28?'#ffab4a':'var(--accent)';
         if(left<=0) autoDrop();
       },90);
     }
@@ -989,12 +1027,16 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
       }
       return null;
     }
+    /* chain scoring: every extra merge set off by one drop multiplies —
+       the 2nd merge pays ×2, the 3rd ×3... one smart drop can cascade big */
     function resolve(){
       const events=[];
+      let chain=0;
       for(;;){
         gravity();
         const pair=findPair();
         if(!pair) break;
+        chain++;
         const [a,b]=pair;
         const ta=grid[a], tb=grid[b];
         const same=ta.s===tb.s;
@@ -1002,19 +1044,20 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
         const drop2=(keep===a)?b:a;
         if(ta.v>=9){
           grid[a]=null; grid[b]=null;
-          const pts=500*level;
+          const pts=500*level*chain;
           score+=pts;
-          events.push({cell:keep,label:`💥 +${pts}`});
+          events.push({cell:keep,label:`💥 +${pts}`,boom:true});
         }else{
           const t=grid[keep];
           t.v+=1;
           if(same) t.s=ta.s;
           grid[drop2]=null;
-          const pts=(t.v+1)*(t.v+1)*5*(same?2:1)*level;
+          const pts=(t.v+1)*(t.v+1)*5*(same?2:1)*level*chain;
           score+=pts;
-          events.push({cell:keep,label:`+${pts}${same?' ×2!':''}`});
+          events.push({cell:keep,label:`+${pts}${same?' ×2':''}${chain>1?' ⚡'+chain:''}`});
         }
       }
+      if(chain>bestChain) bestChain=chain;
       return events;
     }
     /* floating +points over the board — see the score happen */
@@ -1034,14 +1077,14 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
     }
     function saveAV(){
       try{
-        localStorage.setItem('su_av_save',JSON.stringify({grid,queue,score,level,drops}));
+        localStorage.setItem('su_av_save',JSON.stringify({grid,queue,score,level,drops,bestChain}));
       }catch(e){}
     }
     function continueRun(){
       try{
         const s=JSON.parse(localStorage.getItem('su_av_save'));
         if(!s||!s.grid){newRun();return;}
-        grid=s.grid; queue=s.queue; score=s.score; level=s.level; drops=s.drops;
+        grid=s.grid; queue=s.queue; score=s.score; level=s.level; drops=s.drops; bestChain=s.bestChain||0;
         over=false; started=true;
         $('avReady').hidden=true;
         $('avGame').hidden=false;
@@ -1058,9 +1101,10 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
       grid[idx(r,c)]=queue.shift();
       queue.push(spawn());
       drops++;
-      const nl=1+Math.floor(drops/15);
+      const nl=1+Math.floor(drops/12);
       if(nl>level){
         level=nl;
+        SFX.lvl(); buzz(20);
         $('avHint').textContent=`⚡ Level ${level} — the clock is a little faster. Keep the rhythm!`;
       }else if(!fromClock){
         $('avHint').textContent='Tap a ▼ lane to drop — beat the clock!';
@@ -1070,14 +1114,23 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
       let full=true;
       for(let cc=0;cc<COLS;cc++) if(!grid[idx(0,cc)]) full=false;
       render();
-      if(events.length) popPoints(events);
+      if(events.length){
+        popPoints(events);
+        if(events.some(e=>e.boom)) SFX.boom(); else SFX.merge(events.length);
+        buzz(events.length>1?[20,30,20]:15);
+      }else if(!fromClock){
+        SFX.drop();
+      }
       if(full){
         over=true;
         stopTimer();
         localStorage.removeItem('su_av_save');
-        const best=Math.max(score,+(localStorage.getItem('su_aval_best')||0));
+        const prevBest=+(localStorage.getItem('su_aval_best')||0);
+        const best=Math.max(score,prevBest);
         localStorage.setItem('su_aval_best',best);
-        overlay('Wiped out! 🌊',`The beach filled up — level ${level}, score ${score}. Best ${best}. Rock and roll, beach style.`,
+        SFX.over(); buzz([60,40,60]);
+        overlay(score>prevBest&&prevBest>0?'🏆 New best!':'Wiped out! 🌊',
+          `The beach filled up at level ${level}. Score ${score} · best ${best} · longest chain ⚡${bestChain||1}.`,
           [['New run',newRun]]);
       }else{
         saveAV();
@@ -1098,9 +1151,16 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
     }
     function render(){
       boardEl.innerHTML='';
+      /* a lane one tile from the top glows red — clear it or the run ends */
+      const hot=[];
+      for(let c=0;c<COLS;c++){
+        let h=0;
+        for(let r=0;r<ROWS;r++) if(grid[idx(r,c)]) h++;
+        hot[c]=h>=ROWS-1;
+      }
       for(let i=0;i<COLS*ROWS;i++){
         const el=document.createElement('div');
-        el.className='cell'+((i%COLS)%2===1?' laneB':'');
+        el.className='cell'+((i%COLS)%2===1?' laneB':'')+(hot[i%COLS]&&grid[i]?' danger':'');
         if(grid[i]) el.innerHTML=cardHTML(grid[i]);
         el.addEventListener('click',()=>drop(i%COLS));
         boardEl.appendChild(el);
@@ -1110,6 +1170,8 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
       $('avLevel').textContent=level;
       $('avCur').innerHTML=queue[0]?cardHTML(queue[0]):'';
       $('avNext').innerHTML=queue[1]?cardHTML(queue[1]):'';
+      $('avToLv').textContent=12-(drops%12);
+      if(!over&&started&&hot.some(Boolean)) $('avHint').textContent='⚠️ A lane is one tile from the top — merge it down!';
     }
     function enter(){
       if(!started){
