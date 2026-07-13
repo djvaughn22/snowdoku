@@ -259,6 +259,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   #infoPanel{position:fixed; inset:0; background:rgba(8,14,24,.82); display:flex; align-items:center; justify-content:center; z-index:20; padding:14px;}
   #infoPanel[hidden]{display:none;}
 </style>
+<script src="/games.js" defer></script>
 </head>
 <body data-theme="dark">
 
@@ -403,7 +404,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
 <footer class="om-foot">
   <div class="om-in">
     <p>© 2026 <b id="footBrand">OpenDoku<span style="color:var(--accent)">.com</span></b><span id="footTag"> · Beach brain games in Roman numerals</span></p>
-    <p><a href="https://opendoku.com/">🧩 All games</a> &nbsp;·&nbsp; <a href="/slopedoku/">🏔️ SlopeDoku</a> &nbsp;·&nbsp; <a href="/minedoku/">⛏️ MineDoku</a> &nbsp;·&nbsp; <a href="https://opendoku.com/about/">About OpenDoku</a></p>
+    <p id="gamesFootNav"><a href="https://opendoku.com/">🧩 All games</a> &nbsp;·&nbsp; <a href="/slopedoku/">🏔️ SlopeDoku</a> &nbsp;·&nbsp; <a href="/minedoku/">⛏️ MineDoku</a> &nbsp;·&nbsp; <a href="https://opendoku.com/about/">About OpenDoku</a></p>
     <p>
       <a href="https://openmirrorllc.com" target="_blank" rel="noopener noreferrer">OPEN MIRROR LLC</a>
       &nbsp;·&nbsp;
