@@ -11,10 +11,8 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OpenDoku.com — the puzzle-games family. One easy rule, brains required.</title>
-<meta name="description" content="OpenDoku, the Open Mirror puzzle-games series. SlopeDoku (winter), SurfDoku (beach), and MineDoku (underground number digs) — each starts with one easy rule and climbs. More dokus on the way.">
-<meta property="og:title" content="OpenDoku — the puzzle-games family">
-<meta property="og:description" content="SlopeDoku, SurfDoku, and more dokus to come — easy starts, two-puzzle summits. An Open Mirror LLC series.">
+<title>About OpenDoku — what the games are and how they work</title>
+<meta name="description" content="OpenDoku is a family of free puzzle games from Open Mirror LLC. Each game starts with one easy rule, then climbs. No accounts, no ads — progress saves on your device.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧩</text></svg>">
 <meta name="theme-color" content="#0b1220">
 <style>
@@ -44,19 +42,14 @@
   .app{width:100%; max-width:430px; padding:14px 14px 48px; margin:0 auto;}
   .hero{text-align:center; padding:26px 0 10px;}
   .brand{width:76px; height:76px; margin:0 auto 12px; border-radius:24px; background:var(--panel); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:2.5rem;}
-  h1{font-size:2.1rem; margin:0;}
-  h1 span{color:var(--accent);}
+  h1{font-size:2rem; margin:0;}
   .series{margin:6px 0 0; font-size:.72rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); font-family:system-ui,sans-serif;}
-  .tag{margin:8px 0 0; font-size:.95rem; font-weight:bold; color:var(--accent);}
-  .sub{margin:5px 0 0; font-size:.82rem; color:var(--dim); font-style:italic;}
-  .game{display:block; background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:18px; margin-top:14px; text-decoration:none; color:var(--ink);}
-  .game:hover{border-color:var(--accent);}
-  .game .row{display:flex; align-items:center; gap:14px;}
-  .game .ico{font-size:2.2rem;}
-  .game h2{margin:0; font-size:1.25rem;}
-  .game p{margin:4px 0 0; font-size:.85rem; color:var(--dim); line-height:1.5;}
-  .game .go{margin-left:auto; color:var(--accent); font-weight:bold; font-size:1.2rem;}
-  .next{border-style:dashed; text-align:center; color:var(--dim); font-size:.85rem; padding:20px;}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:18px; margin-top:14px;}
+  .card h2{margin:0 0 8px; font-size:1.15rem;}
+  .card p, .card li{font-size:.9rem; color:var(--dim); line-height:1.6; margin:6px 0;}
+  .card ul{margin:0; padding-left:20px;}
+  .card a{color:var(--accent); font-weight:bold; text-decoration:none;}
+  .back{display:block; text-align:center; margin-top:18px; font-family:system-ui,sans-serif; font-weight:800; color:var(--accent); text-decoration:none;}
   .om-foot{width:100%; margin-top:auto; background:var(--panel); border-top:1px solid var(--border); font-family:system-ui,sans-serif; font-size:.8rem; color:var(--dim);}
   .om-foot .om-in{display:block; text-align:center; padding:24px 18px 28px;}
   .om-foot a{text-decoration:none; font-weight:900; color:var(--dim);}
@@ -67,9 +60,8 @@
 
 <header class="om-bar">
   <div class="om-in">
-    <a href="https://openmirrorllc.com" target="_blank" rel="noopener noreferrer">Open Mirror LLC</a>
+    <a href="/" title="All the OpenDoku games">← OpenDoku</a>
     <span class="right">
-      <a href="/about/">About</a>
       <span class="site">OPENDOKU.COM</span>
       <button id="themeBtn" title="Light / dark">🌙</button>
     </span>
@@ -79,59 +71,39 @@
 <div class="app">
   <div class="hero">
     <div class="brand" aria-hidden="true">🧩</div>
-    <h1>OpenDoku<span>.com</span></h1>
+    <h1>About OpenDoku</h1>
     <p class="series">An Open Mirror LLC series</p>
-    <p class="tag">One easy rule per game — then the climb</p>
-    <p class="sub">Pick a world. Same brain, different ground.</p>
   </div>
 
-  <a class="game" href="/slopedoku/">
-    <div class="row">
-      <span class="ico">🏔️</span>
-      <span>
-        <h2>SlopeDoku</h2>
-        <p>Winter brain games in Roman numerals — bunny slope to double black diamond, plus Avalanche.</p>
-      </span>
-      <span class="go">→</span>
-    </div>
-  </a>
-
-  <a class="game" href="/surfdoku/">
-    <div class="row">
-      <span class="ico">🌞</span>
-      <span>
-        <h2>SurfDoku</h2>
-        <p>Beach brain games in Roman numerals — kiddie pool to double red flag, plus Riptide.</p>
-      </span>
-      <span class="go">→</span>
-    </div>
-  </a>
-
-    <a class="game" href="/minedoku/">
-    <div class="row">
-      <span class="ico">⛏️</span>
-      <span>
-        <h2>MineDoku</h2>
-        <p>Mine the numbers that don't belong — every row and column adds to its target. Surface Dig to The Core, plus Lantern memory digs and Cave-In.</p>
-      </span>
-      <span class="go">→</span>
-    </div>
-  </a>
-
-<!-- __DOKU_CARDS_END__ : the StepInTheRing Game Engine inserts new game cards
-       above this marker when it publishes a doku. Don't remove it. -->
-  <div class="game next">
-    Born from seven simple questions at
-    <a href="https://stepinthering.com" style="color:var(--accent); font-weight:bold; text-decoration:none">StepInTheRing.com</a> 🥊
-    — more dokus and other products on the way, built by starting there.
+  <div class="card">
+    <h2>What it is</h2>
+    <p>OpenDoku is a family of free puzzle games. Each game starts with one easy rule, then offers harder versions of that same rule — a named climb from the easiest board to the summit.</p>
+    <p>No accounts, no ads, nothing to install. Your progress and records save on your own device, and every game keeps working offline once you've opened it.</p>
   </div>
+
+  <div class="card">
+    <h2>The games</h2>
+    <ul>
+      <li><a href="/slopedoku/">🏔️ SlopeDoku</a> — winter brain games in Roman numerals, bunny slope to double black diamond, plus the Avalanche survival mode.</li>
+      <li><a href="/surfdoku/">🌞 SurfDoku</a> — the same climb at the beach, kiddie pool to double red flag, plus Riptide.</li>
+      <li><a href="/minedoku/">⛏️ MineDoku</a> — mine the numbers that don't belong; every row and column adds to its target. Surface Dig to The Core, plus Lantern memory digs and Cave-In.</li>
+    </ul>
+    <p>Every game explains itself on its own board, and the ⓘ button inside each game covers the full rules.</p>
+  </div>
+
+  <div class="card">
+    <h2>Who makes it</h2>
+    <p>OpenDoku is built by <a href="https://openmirrorllc.com" target="_blank" rel="noopener noreferrer">Open Mirror LLC</a>, a small family studio in St. Louis. New dokus start as answers to seven simple questions at <a href="https://stepinthering.com" target="_blank" rel="noopener noreferrer">StepInTheRing.com</a>.</p>
+  </div>
+
+  <a class="back" href="/">🧩 Back to all games</a>
 </div>
 
 <footer class="om-foot">
   <div class="om-in">
     <p>© 2026 <b>OpenDoku<span style="color:var(--accent)">.com</span></b> · an Open Mirror LLC series</p>
     <p>
-      <a href="/about/">ABOUT OPENDOKU</a>
+      <a href="/">ALL GAMES</a>
       &nbsp;·&nbsp;
       <a href="https://openmirrorllc.com" target="_blank" rel="noopener noreferrer">OPEN MIRROR LLC</a>
       &nbsp;·&nbsp;

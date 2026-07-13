@@ -248,7 +248,14 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   .hero{padding:12px 0 0;}
   .brand{width:52px; height:52px; font-size:1.6rem; border-radius:16px; margin:0 auto 8px;}
   .hero h1{font-size:1.7rem;}
-  #infoBtn,#sndBtn{border-radius:50%; width:36px; height:36px; padding:0; font-size:1rem; font-family:system-ui,sans-serif;}
+  #infoBtn,#sndBtn,#gamesBtn{border-radius:50%; width:36px; height:36px; padding:0; font-size:1rem; font-family:system-ui,sans-serif;}
+  .menuwrap{position:relative; display:inline-flex;}
+  #gamesMenu{position:absolute; right:0; top:44px; min-width:220px; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:8px; z-index:30; box-shadow:0 10px 30px rgba(0,0,0,.35); font-family:system-ui,sans-serif; text-align:left;}
+  #gamesMenu[hidden]{display:none;}
+  #gamesMenu a{display:block; padding:11px 12px; border-radius:10px; font-weight:800; font-size:.92rem; color:var(--ink); text-decoration:none;}
+  #gamesMenu a:hover{background:var(--btn);}
+  #gamesMenu .sep{border-top:1px solid var(--border); margin:6px 4px;}
+  @media (max-width:430px){.om-bar .site{display:none;}}
   #infoPanel{position:fixed; inset:0; background:rgba(8,14,24,.82); display:flex; align-items:center; justify-content:center; z-index:20; padding:14px;}
   #infoPanel[hidden]{display:none;}
 </style>
@@ -257,9 +264,20 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
 
 <header class="om-bar">
   <div class="om-in">
-    <a href="/" title="All the OpenDoku games">← OpenDoku</a>
+    <a href="https://opendoku.com/" title="All the OpenDoku games">← OpenDoku</a>
     <span class="right">
       <span class="site">SNOWDOKU.COM</span>
+      <span class="menuwrap">
+        <button id="gamesBtn" title="All the games">🧩</button>
+        <nav id="gamesMenu" hidden>
+          <a href="https://opendoku.com/">🧩 All games</a>
+          <a href="/slopedoku/">🏔️ SlopeDoku</a>
+          <a href="/surfdoku/">🌞 SurfDoku</a>
+          <a href="/minedoku/">⛏️ MineDoku</a>
+          <div class="sep" aria-hidden="true"></div>
+          <a href="https://opendoku.com/about/">About OpenDoku</a>
+        </nav>
+      </span>
       <button id="sndBtn" title="Sound on / off">🔊</button>
       <button id="infoBtn" title="About &amp; how to play">ⓘ</button>
       <button id="themeBtn" title="Light / dark">🌙</button>
@@ -385,7 +403,7 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
 <footer class="om-foot">
   <div class="om-in">
     <p>© 2026 <b id="footBrand">OpenDoku<span style="color:var(--accent)">.com</span></b><span id="footTag"> · Beach brain games in Roman numerals</span></p>
-    <p><a href="/">🧩 All games</a> &nbsp;·&nbsp; <a href="/slopedoku/">🏔️ SlopeDoku →</a></p>
+    <p><a href="https://opendoku.com/">🧩 All games</a> &nbsp;·&nbsp; <a href="/slopedoku/">🏔️ SlopeDoku</a> &nbsp;·&nbsp; <a href="/minedoku/">⛏️ MineDoku</a> &nbsp;·&nbsp; <a href="https://opendoku.com/about/">About OpenDoku</a></p>
     <p>
       <a href="https://openmirrorllc.com" target="_blank" rel="noopener noreferrer">OPEN MIRROR LLC</a>
       &nbsp;·&nbsp;
@@ -396,6 +414,13 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku|surfdoku)\.com$/.test(loc
   </div>
 </footer>
 
+<script>
+(function(){
+  const b=document.getElementById('gamesBtn'), m=document.getElementById('gamesMenu');
+  b.addEventListener('click',(e)=>{e.stopPropagation(); m.hidden=!m.hidden;});
+  document.addEventListener('click',(e)=>{if(!m.hidden && !m.contains(e.target)) m.hidden=true;});
+})();
+</script>
 <script>
 (function(){
   'use strict';
