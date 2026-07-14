@@ -259,6 +259,9 @@ if(window.parent===window && /(^|\.)(snowdoku|opendoku)\.com$/.test(location.hos
   #infoPanel[hidden]{display:none;}
 </style>
 <script src="/games.js" defer></script>
+  <!-- Refresh starts at the top (Open Mirror family standard): opt out of the
+       browser's reload scroll restore only; back/forward + #anchors stay native. -->
+  <script>(function(){try{var n=performance.getEntriesByType("navigation")[0];if(!n||n.type!=="reload"||location.hash)return;var armed=true,poll;var disarm=function(){armed=false;clearInterval(poll);removeEventListener("scroll",clamp,true);};var clamp=function(){if(armed&&(window.scrollY||window.scrollX))window.scrollTo(0,0);};addEventListener("scroll",clamp,true);["wheel","touchstart","keydown","pointerdown"].forEach(function(t){addEventListener(t,disarm,{once:true,capture:true,passive:true});});window.scrollTo(0,0);poll=setInterval(clamp,100);addEventListener("load",function(){setTimeout(function(){clamp();disarm();},250);},{once:true});setTimeout(disarm,8000);}catch(e){}})();</script>
 </head>
 <body data-theme="dark">
 
